@@ -17,9 +17,15 @@ function App() {
   const [selectedOption, setSelectedOption] = useState('insurancePrefix');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [sortOption, setSortOption] = useState('insuranceName')
+
   useEffect(() => {
     grabCustomers()
   }, [])
+
+  useEffect(() => {
+    searchCurrentQuery()
+  }, [sortOption])
 
   const grabCustomers = () => {
     const requestConfig = {
@@ -77,14 +83,20 @@ function App() {
     setSearchQuery(e.target.value);
   }
 
+  const handleSortChange = (e) => {
+    console.log('updateSortOption')
+    setSortOption(e.target.value)
+  }
+
   const searchCurrentQuery = () => {
+    setCustomers([])
     let newUrl = API_BASE_URL_Local 
     if(selectedOption === 'insurancePrefix'){
-      newUrl = newUrl + '?' + 'insurancePrefix=' + searchQuery
+      newUrl = newUrl + '?sort=' + sortOption + '&insurancePrefix=' + searchQuery
     } else if (selectedOption === 'insuranceName'){
-      newUrl = newUrl + '?' + 'insuranceName=' + searchQuery
+      newUrl = newUrl + '?sort=' + sortOption + '&insuranceName=' + searchQuery
     } else if (selectedOption === 'insuranceLoc'){
-      newUrl = newUrl + '?' + 'insuranceLoc=' + searchQuery
+      newUrl = newUrl + '?sort=' + sortOption + '&insuranceLoc=' + searchQuery
     } else {
       newUrl = newUrl
     }
@@ -288,14 +300,14 @@ function App() {
             </div>
             <div className='sort-container'>
               <p className='sort-header'>Sort: </p>
-              <select className='sort-select' value={selectedOption} onChange={handleSelect}>
+              <select className='sort-select' value={sortOption} onChange={handleSortChange}>
                 <option value="insuranceName">Insurance Name</option>
                 <option value="insurancePrefix">Insurance Prefix</option>
                 <option value="insuranceLoc">Insurance LOC</option>
-                <option value="insurancePrefix">Daily Rate</option>
-                <option value="insuranceName">VOB</option>
-                <option value="insuranceLoc">Admitted</option>
-                <option value="insuranceLoc">Last Upated</option>
+                <option value="dailyRate">Daily Rate</option>
+                <option value="evaluation">VOB</option>
+                <option value="admitted">Admitted</option>
+                <option value="lastUpdate">Last Upated</option>
               </select>
             </div>
           </div>
