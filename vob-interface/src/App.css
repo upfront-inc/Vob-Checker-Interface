@@ -110,6 +110,10 @@ th, td {
   font-weight: bold;
 }
 
+th {
+  color: white;
+}
+
 thead {
   background-color: grey;
 }

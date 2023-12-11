@@ -29,7 +29,7 @@ function App() {
 
   const grabCustomers = () => {
     const requestConfig = {
-      url: API_BASE_URL_Local, 
+      url: API_BASE_URL, 
       method: 'get',  
       headers: {
         'Content-Type': 'application/json',  
@@ -54,13 +54,13 @@ function App() {
     let unknown = [];
   
     customerList.forEach(customer => {
-      if (customer.data.evaluation === "yes") {
+      if (customer.data.vob === "yes") {
         approved.push(customer);
         old.push(customer)
-      } else if (customer.data.evaluation === "no") {
+      } else if (customer.data.vob === "no") {
         rejected.push(customer);
         old.push(customer)
-      } else if (customer.data.evaluation === "unknown") {
+      } else if (customer.data.vob === "unknown") {
         unknown.push(customer);
       }
     });
@@ -90,7 +90,7 @@ function App() {
 
   const searchCurrentQuery = () => {
     setCustomers([])
-    let newUrl = API_BASE_URL_Local 
+    let newUrl = API_BASE_URL 
     if(selectedOption === 'insurancePrefix'){
       newUrl = newUrl + '?sort=' + sortOption + '&insurancePrefix=' + searchQuery
     } else if (selectedOption === 'insuranceName'){
@@ -135,15 +135,15 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {oldCustomers.map((customer, index) => (
+            {approvedCustomers.map((customer, index) => (
               <tr key={index}>
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.dailyRate}</td>
-                <td>{customer.data.evaluation}</td>
+                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
-                <td>{customer.data.lastUpdate}</td>
+                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
@@ -168,15 +168,14 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {oldCustomers.map((customer, index) => (
+            {rejectedCustomers.map((customer, index) => (
               <tr key={index}>
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.dailyRate}</td>
-                <td>{customer.data.evaluation}</td>
+                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
-                <td>{customer.data.lastUpdate}</td>
+                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
@@ -206,10 +205,9 @@ function App() {
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.dailyRate}</td>
-                <td>{customer.data.evaluation}</td>
+                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
-                <td>{customer.data.lastUpdate}</td>
+                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
@@ -239,10 +237,9 @@ function App() {
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.dailyRate}</td>
-                <td>{customer.data.evaluation}</td>
+                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
-                <td>{customer.data.lastUpdate}</td>
+                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
