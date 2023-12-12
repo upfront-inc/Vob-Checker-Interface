@@ -2,7 +2,7 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://24.144.87.113:3010/api/v1/interface';
+const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Local = 'https://localhost:3010/api/v1/interface';
 
 function App() {
