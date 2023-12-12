@@ -128,7 +128,6 @@ function App() {
               <th>Insurance Name</th>
               <th>Insurance Prefix</th>
               <th>Insurance LOC</th>
-              <th>Daily Rate</th>
               <th>VOB</th>
               <th>Admitted</th>
               <th>Last Updated</th>
@@ -140,7 +139,6 @@ function App() {
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
                 <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
@@ -161,7 +159,6 @@ function App() {
               <th>Insurance Name</th>
               <th>Insurance Prefix</th>
               <th>Insurance LOC</th>
-              <th>Daily Rate</th>
               <th>VOB</th>
               <th>Admitted</th>
               <th>Last Updated</th>
@@ -173,7 +170,7 @@ function App() {
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>                <td>{customer.data.vob}</td>
+                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
                 <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
@@ -193,7 +190,6 @@ function App() {
               <th>Insurance Name</th>
               <th>Insurance Prefix</th>
               <th>Insurance LOC</th>
-              <th>Daily Rate</th>
               <th>VOB</th>
               <th>Admitted</th>
               <th>Last Updated</th>
@@ -205,7 +201,7 @@ function App() {
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>                <td>{customer.data.vob}</td>
+                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
                 <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
@@ -225,7 +221,6 @@ function App() {
               <th>Insurance Name</th>
               <th>Insurance Prefix</th>
               <th>Insurance LOC</th>
-              <th>Daily Rate</th>
               <th>VOB</th>
               <th>Admitted</th>
               <th>Last Updated</th>
@@ -237,7 +232,7 @@ function App() {
                 <td>{customer.data.insuranceName}</td>
                 <td>{customer.data.insurancePrefix}</td>
                 <td>{customer.data.insuranceLoc}</td>
-                <td>${parseFloat(customer.data.dailyRate).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>                <td>{customer.data.vob}</td>
+                <td>{customer.data.vob}</td>
                 <td>{customer.data.admitted}</td>
                 <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
               </tr>
@@ -253,7 +248,7 @@ function App() {
       <div className="App-header">
         <div className='top-bar'>
           <p className='header'>
-            Premier Health Group VOB 
+            PulseWize
           </p>
           <div className="menuTabs">
             <div className='sub-menu left-nav'>
@@ -301,7 +296,6 @@ function App() {
                 <option value="insuranceName">Insurance Name</option>
                 <option value="insurancePrefix">Insurance Prefix</option>
                 <option value="insuranceLoc">Insurance LOC</option>
-                <option value="dailyRate">Daily Rate</option>
                 <option value="evaluation">VOB</option>
                 <option value="admitted">Admitted</option>
                 <option value="lastUpdate">Last Upated</option>
