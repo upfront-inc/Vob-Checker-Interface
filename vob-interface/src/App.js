@@ -112,11 +112,59 @@ function App() {
       .then(response => {
         console.log(response.data.length)
         setCustomers(response.data)
-        sortCustomers(response.data)
+        setCurrentTab('results')
       })
       .catch(error => {
         console.log(error.message)
       })
+  }
+
+  const displayResultsTopbar = () => {
+    return(
+      <div className="menuTabs">
+        <div className='sub-menu left-nav'>
+          <div>
+            <p>Search Results</p>
+          </div>
+        </div>
+        <div className='sub-menu'>
+          <div className="menuTabs">
+            <div className="menuItem" onClick={() => {setCurrentTab('old')}}>
+              <p>X</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const displayDefaultHeader = () => {
+    return(
+      <div className="menuTabs">
+        <div className='sub-menu left-nav'>
+          <div className="menuItem" onClick={() => {setCurrentTab('old')}}>
+            <p>Hisorical Entries</p>
+          </div>
+          <div className="menuItem" onClick={() => {setCurrentTab('new')}}>
+            <p>New Entries</p>
+          </div>
+        </div>
+        <div className='sub-menu'>
+          {
+            currentTab === 'old' || currentTab === 'yes' || currentTab === 'no'
+              ? <div className="menuTabs">
+                  <div className="menuItem" onClick={() => {setCurrentTab('yes')}}>
+                    <p>Approved</p>
+                  </div>
+                  <div className="menuItem" onClick={() => {setCurrentTab('no')}}>
+                    <p>Rejected</p>
+                  </div>
+                </div>
+              : null
+          }
+        </div>
+      </div>
+    )
   }
 
   const displayAccepted = () => {
@@ -243,6 +291,37 @@ function App() {
     )
   }
 
+  const displayResults = () => {
+    return(
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Insurance Name</th>
+              <th>Insurance Prefix</th>
+              <th>Insurance LOC</th>
+              <th>VOB</th>
+              <th>Admitted</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map((customer, index) => (
+              <tr key={index}>
+                <td>{customer.data.insuranceName}</td>
+                <td>{customer.data.insurancePrefix}</td>
+                <td>{customer.data.insuranceLoc}</td>
+                <td>{customer.data.vob}</td>
+                <td>{customer.data.admitted}</td>
+                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
   return (
     <div className="App">
       <div className="App-header">
@@ -250,30 +329,11 @@ function App() {
           <p className='header'>
             IntelliSurance
           </p>
-          <div className="menuTabs">
-            <div className='sub-menu left-nav'>
-              <div className="menuItem" onClick={() => {setCurrentTab('old')}}>
-                <p>Hisorical Entries</p>
-              </div>
-              <div className="menuItem" onClick={() => {setCurrentTab('new')}}>
-                <p>New Entries</p>
-              </div>
-            </div>
-            <div className='sub-menu'>
-              {
-                currentTab === 'old' || currentTab === 'yes' || currentTab === 'no'
-                  ? <div className="menuTabs">
-                      <div className="menuItem" onClick={() => {setCurrentTab('yes')}}>
-                        <p>Approved</p>
-                      </div>
-                      <div className="menuItem" onClick={() => {setCurrentTab('no')}}>
-                        <p>Rejected</p>
-                      </div>
-                    </div>
-                  : null
-              }
-            </div>
-          </div>
+          {
+            currentTab === 'results'
+              ? displayResultsTopbar()
+              : displayDefaultHeader()
+          }
           <div className='bottom-bar'>
             <div className='search-bar'>
               <select className='select-container' value= {selectedOption} onChange={handleSelect}>
@@ -315,7 +375,9 @@ function App() {
                           ? displayRejected()
                           : currentTab === 'new'
                               ? displayUnknown()
-                              : null
+                              : currentTab === 'results'
+                                  ? displayResults()
+                                  : null
           }
         </div>
       </div>
