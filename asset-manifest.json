@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Vob-Checker-Interface/static/css/main.d185f842.css",
-    "main.js": "/Vob-Checker-Interface/static/js/main.aa879ce8.js",
+    "main.js": "/Vob-Checker-Interface/static/js/main.38c00691.js",
     "static/js/787.7987bf97.chunk.js": "/Vob-Checker-Interface/static/js/787.7987bf97.chunk.js",
     "index.html": "/Vob-Checker-Interface/index.html",
     "main.d185f842.css.map": "/Vob-Checker-Interface/static/css/main.d185f842.css.map",
-    "main.aa879ce8.js.map": "/Vob-Checker-Interface/static/js/main.aa879ce8.js.map",
+    "main.38c00691.js.map": "/Vob-Checker-Interface/static/js/main.38c00691.js.map",
     "787.7987bf97.chunk.js.map": "/Vob-Checker-Interface/static/js/787.7987bf97.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d185f842.css",
-    "static/js/main.aa879ce8.js"
+    "static/js/main.38c00691.js"
   ]
 }
