@@ -2,8 +2,8 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://24.144.87.113:3010/api/v1/interface';
-const API_BASE_URL_Local = 'http://localhost:3010/api/v1/interface';
+const API_BASE_URL = 'https://24.144.87.113:3010/api/v1/interface';
+const API_BASE_URL_Local = 'https://localhost:3010/api/v1/interface';
 
 function App() {
   const [customers, setCustomers] = useState([])
@@ -248,7 +248,7 @@ function App() {
       <div className="App-header">
         <div className='top-bar'>
           <p className='header'>
-            PulseWize
+            IntelliSurance
           </p>
           <div className="menuTabs">
             <div className='sub-menu left-nav'>
