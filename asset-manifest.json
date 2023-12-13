@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/Vob-Checker-Interface/static/css/main.d185f842.css",
-    "main.js": "/Vob-Checker-Interface/static/js/main.a6b0444c.js",
+    "main.css": "/Vob-Checker-Interface/static/css/main.d41b6763.css",
+    "main.js": "/Vob-Checker-Interface/static/js/main.d18baaa9.js",
     "static/js/787.7987bf97.chunk.js": "/Vob-Checker-Interface/static/js/787.7987bf97.chunk.js",
+    "static/media/logo.png": "/Vob-Checker-Interface/static/media/logo.d48c84ec660a5e2f2b61.png",
     "index.html": "/Vob-Checker-Interface/index.html",
-    "main.d185f842.css.map": "/Vob-Checker-Interface/static/css/main.d185f842.css.map",
-    "main.a6b0444c.js.map": "/Vob-Checker-Interface/static/js/main.a6b0444c.js.map",
+    "main.d41b6763.css.map": "/Vob-Checker-Interface/static/css/main.d41b6763.css.map",
+    "main.d18baaa9.js.map": "/Vob-Checker-Interface/static/js/main.d18baaa9.js.map",
     "787.7987bf97.chunk.js.map": "/Vob-Checker-Interface/static/js/787.7987bf97.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d185f842.css",
-    "static/js/main.a6b0444c.js"
+    "static/css/main.d41b6763.css",
+    "static/js/main.d18baaa9.js"
   ]
 }
