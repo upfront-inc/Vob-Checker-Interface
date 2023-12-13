@@ -1,6 +1,9 @@
 import './App.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import image from './assets/logo.png'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Local = 'https://localhost:3010/api/v1/interface';
@@ -169,7 +172,7 @@ function App() {
 
   const displayAccepted = () => {
     return(
-      <div className="table-container">
+      <div className="table-container hide-scrollbar">
        <table>
           <thead>
             <tr>
@@ -200,7 +203,7 @@ function App() {
 
   const displayRejected = () => {
     return(
-      <div className="table-container">
+      <div className="table-container hide-scrollbar">
         <table>
           <thead>
             <tr>
@@ -231,7 +234,7 @@ function App() {
 
   const displayUnknown = () => {
     return(
-      <div className="table-container">
+      <div className="table-container hide-scrollbar">
         <table>
           <thead>
             <tr>
@@ -262,7 +265,7 @@ function App() {
 
   const displayOld = () => {
     return(
-      <div className="table-container">
+      <div className="table-container hide-scrollbar">
         <table>
           <thead>
             <tr>
@@ -293,7 +296,7 @@ function App() {
 
   const displayResults = () => {
     return(
-      <div className="table-container">
+      <div className="table-container hide-scrollbar">
         <table>
           <thead>
             <tr>
@@ -325,60 +328,87 @@ function App() {
   return (
     <div className="App">
       <div className="App-header">
-        <div className='top-bar'>
-          <p className='header'>
-            IntelliSurance
-          </p>
-          {
-            currentTab === 'results'
-              ? displayResultsTopbar()
-              : displayDefaultHeader()
-          }
-          <div className='bottom-bar'>
-            <div className='search-bar'>
-              <select className='select-container' value= {selectedOption} onChange={handleSelect}>
-                <option value="insurancePrefix">Insurance Prefix</option>
-                <option value="insuranceName">Insurance Name</option>
-                <option value="insuranceLoc">Insurance LOC</option>
-              </select>
-              <input 
-                className='input'
-                type="text" 
-                placeholder="Search..." 
-                value={searchQuery} 
-                onChange={handleSearchChange} 
-              />
-              <button onClick={() => {searchCurrentQuery()}}>Search</button>
+        <div className='side-bar'>
+          <div>
+            <div className='header'>
+              <img style={{height: '57px', width: '170px'}} src={image} alt='Intellisurance logo'/>
             </div>
-            <div className='sort-container'>
-              <p className='sort-header'>Sort: </p>
-              <select className='sort-select' value={sortOption} onChange={handleSortChange}>
-                <option value="insuranceName">Insurance Name</option>
-                <option value="insurancePrefix">Insurance Prefix</option>
-                <option value="insuranceLoc">Insurance LOC</option>
-                <option value="evaluation">VOB</option>
-                <option value="admitted">Admitted</option>
-                <option value="lastUpdate">Last Upated</option>
-              </select>
+            {
+              currentTab === 'old' || currentTab === 'yes' || currentTab === 'no'
+                ? <div><div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
+                    <p>Existing Policies</p>
+                    <FontAwesomeIcon icon={faChevronUp} />
+                  </div>
+                  <div className='sub-menu'>
+                  <div onClick={() => {setCurrentTab('yes')}} className='menu-tab align-horizontally'>
+                      <p className='menu-text'>Accepted Insurances</p>
+                    </div>
+                    <div onClick={() => {setCurrentTab('no')}} className='menu-tab'>
+                      <p className='menu-text'>Rejected Insurances</p>
+                    </div>
+                </div></div>
+                : <div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
+                    <p>Existing Policies</p>
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </div>
+            }
+            <div onClick={() => {setCurrentTab('new')}} className='menu-tab'>
+              <p>New Policies</p>
             </div>
           </div>
+          <div className='bottom-side-bar bottom-legal'>
+            <p className='legal-disclaimer'>@2023-2024 Intellisurance Inc.</p>
+            <p className='legal-disclaimer'>All rights reserved.</p>
+          </div>
         </div>
-        <div className='table-content'>
-          {
-            loadingData === true
-              ? <p>Loading</p>
-              : currentTab === 'old'
-                  ? displayOld()
-                  : currentTab === 'yes'
-                      ? displayAccepted()
-                      : currentTab === 'no'
-                          ? displayRejected()
-                          : currentTab === 'new'
-                              ? displayUnknown()
-                              : currentTab === 'results'
-                                  ? displayResults()
-                                  : null
-          }
+        <div className='content'>
+          <div className='top-bar'>
+            <div className='bottom-bar'>
+              <div className='search-bar'>
+                <select className='select-container' value= {selectedOption} onChange={handleSelect}>
+                  <option value="insurancePrefix">Insurance Prefix</option>
+                  <option value="insuranceName">Insurance Name</option>
+                  <option value="insuranceLoc">Insurance LOC</option>
+                </select>
+                <input 
+                  className='input'
+                  type="text" 
+                  placeholder="Search..." 
+                  value={searchQuery} 
+                  onChange={handleSearchChange} 
+                />
+                <button onClick={() => {searchCurrentQuery()}}>Search</button>
+              </div>
+              <div className='sort-container'>
+                <p className='sort-header'>Sort: </p>
+                <select className='sort-select' value={sortOption} onChange={handleSortChange}>
+                  <option value="insuranceName">Insurance Name</option>
+                  <option value="insurancePrefix">Insurance Prefix</option>
+                  <option value="insuranceLoc">Insurance LOC</option>
+                  <option value="evaluation">VOB</option>
+                  <option value="admitted">Admitted</option>
+                  <option value="lastUpdate">Last Upated</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className='content-container'>
+            {
+              loadingData === true
+                ? <p>Loading</p>
+                : currentTab === 'old'
+                    ? displayOld()
+                    : currentTab === 'yes'
+                        ? displayAccepted()
+                        : currentTab === 'no'
+                            ? displayRejected()
+                            : currentTab === 'new'
+                                ? displayUnknown()
+                                : currentTab === 'results'
+                                    ? displayResults()
+                                    : null
+            }
+          </div>
         </div>
       </div>
     </div>
