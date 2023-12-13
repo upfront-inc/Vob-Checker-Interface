@@ -377,7 +377,7 @@ function App() {
                   value={searchQuery} 
                   onChange={handleSearchChange} 
                 />
-                <button onClick={() => {searchCurrentQuery()}}>Search</button>
+                <button style={{borderRadius:'8px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
               </div>
               <div className='sort-container'>
                 <p className='sort-header'>Sort: </p>
