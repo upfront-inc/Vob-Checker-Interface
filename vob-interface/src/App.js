@@ -4,12 +4,16 @@ import axios from 'axios';
 import image from './assets/logo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
+import TableCompnent from './components/TableCompnent';
+import MoreDetailTableComponent from './components/MoreDetailTableComponent';
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
-const API_BASE_URL_Local = 'https://localhost:3010/api/v1/interface';
+const API_BASE_URL_Local = 'http://localhost:3010/api/v1/interface';
+const API_BASE_URL_Local_Historical = 'http://localhost:3010/api/v1/interface-historical';
 
 function App() {
   const [customers, setCustomers] = useState([])
+  const [customersH, setCustomersH] = useState([])
   const [approvedCustomers, setApprovedCustomers] = useState([])
   const [rejectedCustomers, setRejectedCustomers] = useState([])
   const [oldCustomers, setOldCustomers] = useState([])
@@ -32,7 +36,14 @@ function App() {
 
   const grabCustomers = () => {
     const requestConfig = {
-      url: API_BASE_URL, 
+      url: API_BASE_URL_Local, 
+      method: 'get',  
+      headers: {
+        'Content-Type': 'application/json',  
+      },
+    };
+    const requestConfigH = {
+      url: API_BASE_URL_Local_Historical, 
       method: 'get',  
       headers: {
         'Content-Type': 'application/json',  
@@ -43,7 +54,15 @@ function App() {
         console.log(response.data.length)
         setCustomers(response.data)
         sortCustomers(response.data)
-        setLoadingData(false)
+        axios.request(requestConfigH)
+          .then(response => {
+            console.log(response.data.length)
+            setCustomersH(response.data)
+            setLoadingData(false)
+          })
+          .catch(error => {
+            console.log(error.message)
+          })
       })
       .catch(error => {
         console.log(error.message)
@@ -93,7 +112,7 @@ function App() {
 
   const searchCurrentQuery = () => {
     setCustomers([])
-    let newUrl = API_BASE_URL 
+    let newUrl = API_BASE_URL_Local 
     if(selectedOption === 'insurancePrefix'){
       newUrl = newUrl + '?sort=' + sortOption + '&insurancePrefix=' + searchQuery
     } else if (selectedOption === 'insuranceName'){
@@ -120,209 +139,6 @@ function App() {
       .catch(error => {
         console.log(error.message)
       })
-  }
-
-  const displayResultsTopbar = () => {
-    return(
-      <div className="menuTabs">
-        <div className='sub-menu left-nav'>
-          <div>
-            <p>Search Results</p>
-          </div>
-        </div>
-        <div className='sub-menu'>
-          <div className="menuTabs">
-            <div className="menuItem" onClick={() => {setCurrentTab('old')}}>
-              <p>X</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const displayDefaultHeader = () => {
-    return(
-      <div className="menuTabs">
-        <div className='sub-menu left-nav'>
-          <div className="menuItem" onClick={() => {setCurrentTab('old')}}>
-            <p>Hisorical Entries</p>
-          </div>
-          <div className="menuItem" onClick={() => {setCurrentTab('new')}}>
-            <p>New Entries</p>
-          </div>
-        </div>
-        <div className='sub-menu'>
-          {
-            currentTab === 'old' || currentTab === 'yes' || currentTab === 'no'
-              ? <div className="menuTabs">
-                  <div className="menuItem" onClick={() => {setCurrentTab('yes')}}>
-                    <p>Approved</p>
-                  </div>
-                  <div className="menuItem" onClick={() => {setCurrentTab('no')}}>
-                    <p>Rejected</p>
-                  </div>
-                </div>
-              : null
-          }
-        </div>
-      </div>
-    )
-  }
-
-  const displayAccepted = () => {
-    return(
-      <div className="table-container hide-scrollbar">
-       <table>
-          <thead>
-            <tr>
-              <th>Insurance Name</th>
-              <th>Insurance Prefix</th>
-              <th>Insurance LOC</th>
-              <th>VOB</th>
-              <th>Admitted</th>
-              <th>Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {approvedCustomers.map((customer, index) => (
-              <tr key={index}>
-                <td>{customer.data.insuranceName}</td>
-                <td>{customer.data.insurancePrefix}</td>
-                <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.vob}</td>
-                <td>{customer.data.admitted}</td>
-                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-
-  const displayRejected = () => {
-    return(
-      <div className="table-container hide-scrollbar">
-        <table>
-          <thead>
-            <tr>
-              <th>Insurance Name</th>
-              <th>Insurance Prefix</th>
-              <th>Insurance LOC</th>
-              <th>VOB</th>
-              <th>Admitted</th>
-              <th>Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rejectedCustomers.map((customer, index) => (
-              <tr key={index}>
-                <td>{customer.data.insuranceName}</td>
-                <td>{customer.data.insurancePrefix}</td>
-                <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.vob}</td>
-                <td>{customer.data.admitted}</td>
-                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-
-  const displayUnknown = () => {
-    return(
-      <div className="table-container hide-scrollbar">
-        <table>
-          <thead>
-            <tr>
-              <th>Insurance Name</th>
-              <th>Insurance Prefix</th>
-              <th>Insurance LOC</th>
-              <th>VOB</th>
-              <th>Admitted</th>
-              <th>Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {unknownCustomers.map((customer, index) => (
-              <tr key={index}>
-                <td>{customer.data.insuranceName}</td>
-                <td>{customer.data.insurancePrefix}</td>
-                <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.vob}</td>
-                <td>{customer.data.admitted}</td>
-                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-
-  const displayOld = () => {
-    return(
-      <div className="table-container hide-scrollbar">
-        <table>
-          <thead>
-            <tr>
-              <th>Insurance Name</th>
-              <th>Insurance Prefix</th>
-              <th>Insurance LOC</th>
-              <th>VOB</th>
-              <th>Admitted</th>
-              <th>Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {oldCustomers.map((customer, index) => (
-              <tr key={index}>
-                <td>{customer.data.insuranceName}</td>
-                <td>{customer.data.insurancePrefix}</td>
-                <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.vob}</td>
-                <td>{customer.data.admitted}</td>
-                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-
-  const displayResults = () => {
-    return(
-      <div className="table-container hide-scrollbar">
-        <table>
-          <thead>
-            <tr>
-              <th>Insurance Name</th>
-              <th>Insurance Prefix</th>
-              <th>Insurance LOC</th>
-              <th>VOB</th>
-              <th>Admitted</th>
-              <th>Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customers.map((customer, index) => (
-              <tr key={index}>
-                <td>{customer.data.insuranceName}</td>
-                <td>{customer.data.insurancePrefix}</td>
-                <td>{customer.data.insuranceLoc}</td>
-                <td>{customer.data.vob}</td>
-                <td>{customer.data.admitted}</td>
-                <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
   }
 
   return (
@@ -354,6 +170,9 @@ function App() {
             }
             <div onClick={() => {setCurrentTab('new')}} className='menu-tab'>
               <p>New Policies</p>
+            </div>
+            <div onClick={() => {setCurrentTab('billing')}} className='menu-tab'>
+              <p>Billing Details</p>
             </div>
           </div>
           <div className='bottom-side-bar bottom-legal'>
@@ -397,16 +216,19 @@ function App() {
               loadingData === true
                 ? <p>Loading</p>
                 : currentTab === 'old'
-                    ? displayOld()
+                    ? <TableCompnent list={oldCustomers} customersH={customersH}/>
                     : currentTab === 'yes'
-                        ? displayAccepted()
+                        ? <TableCompnent list={approvedCustomers} customersH={customersH}/>
                         : currentTab === 'no'
-                            ? displayRejected()
+                            ? <TableCompnent list={rejectedCustomers} customersH={customersH}/>
                             : currentTab === 'new'
-                                ? displayUnknown()
+                                ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                 : currentTab === 'results'
-                                    ? displayResults()
-                                    : null
+                                    ? <TableCompnent list={customers} customersH={customersH}/>
+                                    : currentTab === 'billing'
+                                        ? <MoreDetailTableComponent customersH={customersH}/>
+                                        : null
+
             }
           </div>
         </div>
