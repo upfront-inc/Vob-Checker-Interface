@@ -6,8 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import TableCompnent from './components/TableCompnent';
 import MoreDetailTableComponent from './components/MoreDetailTableComponent';
+import ResultTableCompnent from './components/ResultTableComponent';
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
+const API_BASE_URL_Historical = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Local = 'http://localhost:3010/api/v1/interface';
 const API_BASE_URL_Local_Historical = 'http://localhost:3010/api/v1/interface-historical';
 
@@ -122,9 +124,27 @@ function App() {
     } else {
       newUrl = newUrl
     }
+    let newUrlH = API_BASE_URL_Local_Historical
+    if(selectedOption === 'insurancePrefix'){
+      newUrlH = newUrlH + '?sort=' + sortOption + '&insurancePrefix=' + searchQuery
+    } else if (selectedOption === 'insuranceName'){
+      newUrlH = newUrlH + '?sort=' + sortOption + '&insuranceName=' + searchQuery
+    } else if (selectedOption === 'insuranceLoc'){
+      newUrlH = newUrlH + '?sort=' + sortOption + '&insuranceLoc=' + searchQuery
+    } else {
+      newUrlH = newUrlH
+    }
     console.log(newUrl)
+    console.log(newUrlH)
     const requestConfig = {
       url: newUrl, 
+      method: 'get',  
+      headers: {
+        'Content-Type': 'application/json',  
+      },
+    };
+    const requestConfigH = {
+      url: newUrlH, 
       method: 'get',  
       headers: {
         'Content-Type': 'application/json',  
@@ -134,7 +154,14 @@ function App() {
       .then(response => {
         console.log(response.data.length)
         setCustomers(response.data)
-        setCurrentTab('results')
+        axios.request(requestConfigH)
+          .then(response => {
+            setCustomersH(response.data)
+            setLoadingData(false)
+          })
+          .catch(error => {
+            console.log(error.message)
+          })
       })
       .catch(error => {
         console.log(error.message)
@@ -150,27 +177,32 @@ function App() {
               <img style={{height: '57px', width: '170px'}} src={image} alt='Intellisurance logo'/>
             </div>
             {
-              currentTab === 'old' || currentTab === 'yes' || currentTab === 'no'
-                ? <div><div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
-                    <p>Existing Policies</p>
-                    <FontAwesomeIcon icon={faChevronUp} />
+              console.log(currentTab)
+            }
+            {
+              currentTab === 'old' || currentTab === 'yes' || currentTab === 'no' || currentTab === 'new'
+                ? <div>
+                    <div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
+                      <p>Existing Policies</p>
+                      <FontAwesomeIcon icon={faChevronUp} />
+                    </div>
+                    <div className='sub-menu'>
+                    <div onClick={() => {setCurrentTab('yes')}} className='menu-tab align-horizontally'>
+                        <p className='menu-text'>Accepted Insurances</p>
+                      </div>
+                      <div onClick={() => {setCurrentTab('no')}} className='menu-tab'>
+                        <p className='menu-text'>Rejected Insurances</p>
+                      </div>
+                    </div>
+                    <div onClick={() => {setCurrentTab('new')}} className='menu-tab'>
+                      <p className='menu-text'>Unknown Insurances</p>
+                    </div>
                   </div>
-                  <div className='sub-menu'>
-                  <div onClick={() => {setCurrentTab('yes')}} className='menu-tab align-horizontally'>
-                      <p className='menu-text'>Accepted Insurances</p>
-                    </div>
-                    <div onClick={() => {setCurrentTab('no')}} className='menu-tab'>
-                      <p className='menu-text'>Rejected Insurances</p>
-                    </div>
-                </div></div>
                 : <div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
                     <p>Existing Policies</p>
                     <FontAwesomeIcon icon={faChevronDown} />
                   </div>
             }
-            <div onClick={() => {setCurrentTab('new')}} className='menu-tab'>
-              <p>New Policies</p>
-            </div>
             <div onClick={() => {setCurrentTab('billing')}} className='menu-tab'>
               <p>Billing Details</p>
             </div>
@@ -224,7 +256,7 @@ function App() {
                             : currentTab === 'new'
                                 ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                 : currentTab === 'results'
-                                    ? <TableCompnent list={customers} customersH={customersH}/>
+                                    ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                     : currentTab === 'billing'
                                         ? <MoreDetailTableComponent customersH={customersH}/>
                                         : null

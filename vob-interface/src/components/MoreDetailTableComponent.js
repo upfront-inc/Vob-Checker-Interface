@@ -42,8 +42,22 @@ const MoreDetailTableComponent = (props) => {
                             : <td>{customer.data.DetoxDays} Days</td>
                     }
                     <td>{formatDollarAmount(customer.data.totalCharges)}</td>
-                    <td>{formatDollarAmount(customer.data.totalPaid)}</td>
-                    <td>{customer.data.payoutRatio}%</td>
+                    {
+                        customer.data.totalPaid >= 30000
+                            ? <td style={{backgroundColor: '#50c878'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                            : customer.data.totalPaid  > 0
+                                ? <td style={{backgroundColor: '#ff5733'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                                : <td>{formatDollarAmount(customer.data.totalPaid)}</td>
+                    }
+                    {
+                        (((customer.data.payoutRatio) * 100).toFixed(0)) >= 75
+                            ? <td style={{backgroundColor: '#50c878'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                            : (((customer.data.payoutRatio) * 100).toFixed(0)) >= 50 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 75
+                                ? <td style={{backgroundColor: '#ffc300'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                : (((customer.data.payoutRatio) * 100).toFixed(0)) > 0 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 50
+                                    ? <td style={{backgroundColor: '#ff5733'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                    : <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                    }
                     <td>{customer.data.facility}</td>
                     <td>{customer.data.network}</td>
                     </tr>

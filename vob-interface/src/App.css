@@ -114,6 +114,13 @@
   margin-bottom: 16px;
 }
 
+.table-container-half {
+  overflow-y: auto;
+  height: 48;
+  width: 86vw; 
+  margin-bottom: 16px;
+}
+
 .table-content {
   width: 100%;
   height: 50%;
