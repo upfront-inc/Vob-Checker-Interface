@@ -6,7 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import TableCompnent from './components/TableCompnent';
 import MoreDetailTableComponent from './components/MoreDetailTableComponent';
-import ResultTableCompnent from './components/ResultTableComponent';
+import { auth, db } from './config/Firebase';
+import LoginScreen from './screens/LoginScreen';
+import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Historical = 'https://www.telliref.com/api/v1/interface';
@@ -28,13 +31,55 @@ function App() {
 
   const [sortOption, setSortOption] = useState('insuranceName')
 
+  const [currentView, setCurrentView] = useState('content')
+
+  const [userAccess, setuserAccess] = useState('staff')
+
   useEffect(() => {
-    grabCustomers()
-  }, [])
+    if (auth.currentUser === null) {
+      console.log()
+    } else {
+      grabCustomers();
+    }
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        setCurrentView('content');
+        grabUserInfo();
+        grabCustomers();
+      } else {
+        setCurrentView('login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     searchCurrentQuery()
   }, [sortOption])
+
+  const grabUserInfo = () => {
+    const userRef = doc(db, "users", auth.currentUser.uid);
+
+    getDoc(userRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          let access = docSnap.data();
+          console.log("User data:", access.status);
+          setuserAccess(access.status)
+        } else {
+          console.log("No such user!");
+          return null;
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+        throw error;
+      });
+  }
 
   const grabCustomers = () => {
     const requestConfig = {
@@ -113,63 +158,22 @@ function App() {
   }
 
   const searchCurrentQuery = () => {
-    setCustomers([])
     let newUrl = API_BASE_URL_Local 
-    if(selectedOption === 'insurancePrefix'){
-      newUrl = newUrl + '?sort=' + sortOption + '&insurancePrefix=' + searchQuery
-    } else if (selectedOption === 'insuranceName'){
-      newUrl = newUrl + '?sort=' + sortOption + '&insuranceName=' + searchQuery
-    } else if (selectedOption === 'insuranceLoc'){
-      newUrl = newUrl + '?sort=' + sortOption + '&insuranceLoc=' + searchQuery
-    } else {
-      newUrl = newUrl
-    }
-    let newUrlH = API_BASE_URL_Local_Historical
-    if(selectedOption === 'insurancePrefix'){
-      newUrlH = newUrlH + '?sort=' + sortOption + '&insurancePrefix=' + searchQuery
-    } else if (selectedOption === 'insuranceName'){
-      newUrlH = newUrlH + '?sort=' + sortOption + '&insuranceName=' + searchQuery
-    } else if (selectedOption === 'insuranceLoc'){
-      newUrlH = newUrlH + '?sort=' + sortOption + '&insuranceLoc=' + searchQuery
-    } else {
-      newUrlH = newUrlH
-    }
-    console.log(newUrl)
-    console.log(newUrlH)
-    const requestConfig = {
-      url: newUrl, 
-      method: 'get',  
-      headers: {
-        'Content-Type': 'application/json',  
-      },
-    };
-    const requestConfigH = {
-      url: newUrlH, 
-      method: 'get',  
-      headers: {
-        'Content-Type': 'application/json',  
-      },
-    };
-    axios.request(requestConfig)
-      .then(response => {
-        console.log(response.data.length)
-        setCustomers(response.data)
-        axios.request(requestConfigH)
-          .then(response => {
-            setCustomersH(response.data)
-            setLoadingData(false)
-          })
-          .catch(error => {
-            console.log(error.message)
-          })
-      })
-      .catch(error => {
-        console.log(error.message)
-      })
+    
   }
 
-  return (
-    <div className="App">
+  const signoutUser = () => {
+    signOut(auth)
+      .then(() => {
+          setCurrentView('login')
+      })
+      .catch((error) => {
+          console.error("Error signing out:", error);
+      });
+  }
+
+  const displayContent = () => {
+    return(
       <div className="App-header">
         <div className='side-bar'>
           <div>
@@ -207,24 +211,24 @@ function App() {
               <p>Billing Details</p>
             </div>
           </div>
-          <div className='bottom-side-bar bottom-legal'>
-            <p className='legal-disclaimer'>@2023-2024 Intellisurance Inc.</p>
-            <p className='legal-disclaimer'>All rights reserved.</p>
+          <div>
+            <div onClick={() => {signoutUser()}} className='menu-tab align-horizontally'>
+              <p style={{color: 'red'}}>Logout</p>
+            </div>
+            <div className='bottom-side-bar bottom-legal'>
+              <p className='legal-disclaimer'>@2023-2024 Intellisurance Inc.</p>
+              <p className='legal-disclaimer'>All rights reserved.</p>
+            </div>
           </div>
         </div>
         <div className='content'>
           <div className='top-bar'>
             <div className='bottom-bar'>
               <div className='search-bar'>
-                <select className='select-container' value= {selectedOption} onChange={handleSelect}>
-                  <option value="insurancePrefix">Insurance Prefix</option>
-                  <option value="insuranceName">Insurance Name</option>
-                  <option value="insuranceLoc">Insurance LOC</option>
-                </select>
                 <input 
                   className='input'
                   type="text" 
-                  placeholder="Search..." 
+                  placeholder="Search Prefix..." 
                   value={searchQuery} 
                   onChange={handleSearchChange} 
                 />
@@ -235,10 +239,6 @@ function App() {
                 <select className='sort-select' value={sortOption} onChange={handleSortChange}>
                   <option value="insuranceName">Insurance Name</option>
                   <option value="insurancePrefix">Insurance Prefix</option>
-                  <option value="insuranceLoc">Insurance LOC</option>
-                  <option value="evaluation">VOB</option>
-                  <option value="admitted">Admitted</option>
-                  <option value="lastUpdate">Last Upated</option>
                 </select>
               </div>
             </div>
@@ -258,13 +258,31 @@ function App() {
                                 : currentTab === 'results'
                                     ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                     : currentTab === 'billing'
-                                        ? <MoreDetailTableComponent customersH={customersH}/>
+                                        ? <MoreDetailTableComponent userAccess={userAccess} customersH={customersH}/>
                                         : null
 
             }
           </div>
         </div>
       </div>
+    )
+  }
+
+  const displayLogin = () => {
+    return(
+      <div>
+        <LoginScreen setCurrentView={setCurrentView}/>
+      </div>
+    )
+  }
+
+  return (
+    <div className="App">
+      {
+        auth.currentUser === null 
+          ? displayLogin()
+          : displayContent()
+      }
     </div>
   );
 }

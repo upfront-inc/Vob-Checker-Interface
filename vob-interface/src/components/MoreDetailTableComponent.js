@@ -1,13 +1,30 @@
 import React from 'react'
+import { auth } from '../config/Firebase'
 
 const MoreDetailTableComponent = (props) => {
     const {
-        customersH
+        customersH,
+        userAccess
     } = props
 
     const formatDollarAmount = (str) => {
         const num = parseFloat(str);
         return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    const showDetails = (customer) => {
+        return(
+            <>
+                <td>{formatDollarAmount(customer.data.totalCharges)}</td>
+                {
+                    customer.data.totalPaid >= 30000
+                        ? <td style={{backgroundColor: '#50c878'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                        : customer.data.totalPaid  > 0
+                            ? <td style={{backgroundColor: '#ff5733'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                            : <td>{formatDollarAmount(customer.data.totalPaid)}</td>
+                }
+            </>
+        )
     }
 
     return (
@@ -16,11 +33,20 @@ const MoreDetailTableComponent = (props) => {
                 <thead>
                 <tr>
                     <th>Insurance</th>
+                    <th>Policy</th>
                     <th>Prefix</th>
                     <th>Residential</th>
                     <th>Detox</th>
-                    <th>Total Charges</th>
-                    <th>Total Paid</th>
+                    {
+                        userAccess === 'staff'
+                            ? null
+                            : <th>Total Charges</th>
+                    }
+                    {
+                        userAccess === 'staff'
+                        ? null
+                        : <th>Total Paid</th>
+                    }
                     <th>Payout Ratio</th>
                     <th>Facility</th>
                     <th>Network</th>
@@ -30,6 +56,7 @@ const MoreDetailTableComponent = (props) => {
                 {customersH.map((customer, index) => (
                     <tr key={index}>
                     <td>{customer.data.insuranceCompany}</td>
+                    <td>{customer.data.policyNumber}</td>
                     <td>{customer.data.prefix}</td>
                     {
                         customer.data.ResidentialDays === undefined
@@ -41,13 +68,10 @@ const MoreDetailTableComponent = (props) => {
                             ? <td>--</td>
                             : <td>{customer.data.DetoxDays} Days</td>
                     }
-                    <td>{formatDollarAmount(customer.data.totalCharges)}</td>
                     {
-                        customer.data.totalPaid >= 30000
-                            ? <td style={{backgroundColor: '#50c878'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
-                            : customer.data.totalPaid  > 0
-                                ? <td style={{backgroundColor: '#ff5733'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
-                                : <td>{formatDollarAmount(customer.data.totalPaid)}</td>
+                        userAccess === 'staff'
+                            ? null 
+                            : showDetails(customer)
                     }
                     {
                         (((customer.data.payoutRatio) * 100).toFixed(0)) >= 75
