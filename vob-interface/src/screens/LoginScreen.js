@@ -1,7 +1,9 @@
+import '../login.css'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
 import { auth, db } from '../config/Firebase'
 import { doc, setDoc } from 'firebase/firestore'
+import image from '../assets/logo.png'
 
 const LoginScreen = (props) => {
     const {
@@ -72,15 +74,17 @@ const LoginScreen = (props) => {
 
     const displayLogin = () => {
         return(
-            <div>
-                <div>LoginScreen</div>
-                {
-                    invalidLogin
-                        ? <p>Email/Password don't match any records</p>
-                        : null 
-                }
-                <div>
-                    <p>Email</p>
+            <div className='form-container'>
+                <div className='form-header'>Login</div>
+                <div className='errors'>
+                    {
+                        invalidLogin
+                            ? <p className='error'>Email/Password don't match any records</p>
+                            : null 
+                    }
+                </div>
+                <div className='input-container'>
+                    <p className='label'>Email</p>
                     <input 
                         className='input'
                         type="text" 
@@ -89,8 +93,8 @@ const LoginScreen = (props) => {
                         onChange={handleLoginEmailChange} 
                     />
                 </div>
-                <div>
-                    <p>Password</p>
+                <div className='input-container'>
+                    <p className='label'>Password</p>
                     <input 
                         className='input'
                         type="password" 
@@ -99,8 +103,10 @@ const LoginScreen = (props) => {
                         onChange={handleLoginPasswordChange}
                         />
                 </div>
-                <button onClick={() => {loginUser()}}>Login</button>
-                <button onClick={() => {setCurrentTab('Signup')}}>Signup</button>
+                <div className='buttons-container'>
+                    <button className='button' onClick={() => {loginUser()}}>Login</button>
+                    <button className='button' onClick={() => {setCurrentTab('Signup')}}>Signup</button>
+                </div>
             </div>
         )
     }
@@ -114,17 +120,21 @@ const LoginScreen = (props) => {
     const createUserAccount = () => {
         createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
             .then((userCredential) => {
-                createProfile(userCredential.user.uid)
+                console.log(JSON.stringify(userCredential.user))
+                createProfile(userCredential.user)
             })
             .catch((error) => {
                 console.error('Error creating account:', error.message);
             });
         }
         
-    const createProfile = (userId) => {
-        const userRef = doc(db, "users", userId);
+    const createProfile = (user) => {
+        console.log(user.uid)
+        const userRef = doc(db, "users", user.uid);
         const userData = {
-            userId: userId,
+            userId: user.uid,
+            email: user.email,
+            company: 'PHG',
             status: 'staff',
         }
         setDoc(userRef, userData)
@@ -138,10 +148,32 @@ const LoginScreen = (props) => {
 
     const displaySignup = () => {
         return(
-            <div>
-                <div>LoginScreen</div>
-                <div>
-                    <p>Email</p>
+            <div className='form-container'>
+                <div className='form-header'>Signup</div>
+                <div className='errors'>
+                    {
+                        validSignupEmail
+                        ? null
+                        : <p className='error'>Please enter a valid email!</p>
+                    }
+                    {
+                        validPasswordLength
+                        ? null 
+                        : <p className='error'>Passwords must be 8 characters</p>
+                    }
+                    {
+                        validPasswordNumber
+                        ? null 
+                        : <p className='error'>Passwords must include (0-9)</p>
+                    }
+                    {
+                        validMatchingPassword
+                            ? null 
+                            : <p className='error'>Password / Verify Don't match</p>
+                    }
+                </div>
+                <div className='input-container'>
+                    <p className='label'>Email</p>
                     <input 
                         className='input'
                         type="text" 
@@ -151,14 +183,9 @@ const LoginScreen = (props) => {
                         />
                 </div>
                 <div>
-                    {
-                        validSignupEmail
-                            ? null
-                            : <p>Please enter a valid email!</p>
-                    }
                 </div>
-                <div>
-                    <p>Password</p>
+                <div className='input-container'>
+                    <p className='label'>Password</p>
                     <input 
                         className='input'
                         type="password" 
@@ -168,18 +195,8 @@ const LoginScreen = (props) => {
                         onChange={handleSignupPasswordChange}
                     />
                 </div>
-                {
-                    validPasswordLength
-                        ? null 
-                        : <p>Passwords must be 8 characters</p>
-                }
-                {
-                    validPasswordNumber
-                        ? null 
-                        : <p>Passwords must include a number 0-9</p>
-                }
-                <div>
-                    <p>Verify Password</p>
+                <div className='input-container'>
+                    <p className='label'>Verify Password</p>
                     <input 
                         className='input'
                         type="password" 
@@ -189,24 +206,19 @@ const LoginScreen = (props) => {
                         onChange={handleSignupVerifyChange}
                     />
                 </div>
-                {
-                    validMatchingPassword
-                        ? null 
-                        : <p>Password / Verify Don't match</p>
-                }
-                {
-                    auth.currentUser === null 
-                        ? null 
-                        : <p>{auth.currentUser.uid}</p>
-                }
-                <button onClick={() => {signupUser()}}>Signup</button>
-                <button onClick={() => {setCurrentTab('Login')}}>Login</button>
+                <div className='buttons-container'>
+                    <button className='button' onClick={() => {signupUser()}}>Signup</button>
+                    <button className='button' onClick={() => {setCurrentTab('Login')}}>Login</button>
+                </div>
             </div>
         )
     }
 
     return (
-        <div>
+        <div className='page'>
+            <div className='image-container'>
+                <img style={{height: '58px', width: '180px'}} src={image} alt='Intellisurance logo'/>
+            </div>
             {
                 currentTab === 'Login'
                     ? displayLogin()

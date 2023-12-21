@@ -10,6 +10,7 @@ import { auth, db } from './config/Firebase';
 import LoginScreen from './screens/LoginScreen';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import AdminPanel from './components/AdminPanel';
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Historical = 'https://www.telliref.com/api/v1/interface';
@@ -34,14 +35,7 @@ function App() {
   const [currentView, setCurrentView] = useState('content')
 
   const [userAccess, setuserAccess] = useState('staff')
-
-  useEffect(() => {
-    if (auth.currentUser === null) {
-      console.log()
-    } else {
-      grabCustomers();
-    }
-  }, []);
+  const [userInfo, setUserInfo] = useState('')
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -69,6 +63,7 @@ function App() {
         if (docSnap.exists()) {
           let access = docSnap.data();
           console.log("User data:", access.status);
+          setUserInfo(access)
           setuserAccess(access.status)
         } else {
           console.log("No such user!");
@@ -98,12 +93,10 @@ function App() {
     };
     axios.request(requestConfig)
       .then(response => {
-        console.log(response.data.length)
         setCustomers(response.data)
         sortCustomers(response.data)
         axios.request(requestConfigH)
           .then(response => {
-            console.log(response.data.length)
             setCustomersH(response.data)
             setLoadingData(false)
           })
@@ -133,10 +126,6 @@ function App() {
         unknown.push(customer);
       }
     });
-
-    console.log('approved length: ', approved.length)
-    console.log('rejected length: ', rejected.length)
-    console.log('unknown length: ', unknown.length)
   
     setApprovedCustomers(approved);
     setRejectedCustomers(rejected);
@@ -153,7 +142,6 @@ function App() {
   }
 
   const handleSortChange = (e) => {
-    console.log('updateSortOption')
     setSortOption(e.target.value)
   }
 
@@ -180,9 +168,6 @@ function App() {
             <div className='header'>
               <img style={{height: '57px', width: '170px'}} src={image} alt='Intellisurance logo'/>
             </div>
-            {
-              console.log(currentTab)
-            }
             {
               currentTab === 'old' || currentTab === 'yes' || currentTab === 'no' || currentTab === 'new'
                 ? <div>
@@ -212,6 +197,13 @@ function App() {
             </div>
           </div>
           <div>
+            {
+              userAccess === 'staff'
+                ? null
+                : <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
+                    <p>Admin Panel</p>
+                  </div>
+            }
             <div onClick={() => {signoutUser()}} className='menu-tab align-horizontally'>
               <p style={{color: 'red'}}>Logout</p>
             </div>
@@ -259,7 +251,9 @@ function App() {
                                     ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                     : currentTab === 'billing'
                                         ? <MoreDetailTableComponent userAccess={userAccess} customersH={customersH}/>
-                                        : null
+                                        : currentTab === 'admin'
+                                            ? <AdminPanel userInfo={userInfo}/>
+                                            : null
 
             }
           </div>
