@@ -1,8 +1,8 @@
 import '../login.css'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import React, { useState } from 'react'
 import { auth, db } from '../config/Firebase'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import image from '../assets/logo.png'
 
 const LoginScreen = (props) => {
@@ -20,11 +20,14 @@ const LoginScreen = (props) => {
     const [signupEmail, setSignupEmail] = useState('')
     const [signupPassword, setSignupPassword] = useState('')
     const [signupVerify, setSignupVerify] = useState('')
+    const [signupName, setSignupName] = useState('')
 
     const [validSignupEmail, setValidSignupEmail] = useState(false)
     const [validPasswordLength, setValidPasswordLength] = useState(false)
     const [validPasswordNumber, setValidPasswordNumber] = useState(false)
     const [validMatchingPassword, setValidMatchingPassword] = useState(false)
+
+    const [activeAccount, setActiveAccount] = useState(true)
 
     const handleLoginEmailChange = (e) => {
         setLoginEmail(e.target.value)
@@ -32,6 +35,10 @@ const LoginScreen = (props) => {
 
     const handleLoginPasswordChange = (e) => {
         setLoginPassword(e.target.value);
+    }
+
+    const handleSignupNameChange = (e) => {
+        setSignupName(e.target.value);
     }
 
     const handleSignupEmailChange = (e) => {
@@ -62,13 +69,35 @@ const LoginScreen = (props) => {
         setSignupVerify(e.target.value);
     }
 
+    const grabUserInfo = (userId) => {
+        const userRef = doc(db, "users", userId);
+
+        getDoc(userRef)
+            .then((docSnap) => {
+                if (docSnap.exists()) {
+                    let userInfo = docSnap.data();
+                    if(userInfo.type === 'active'){
+                        setCurrentView('content');
+                    } else {
+                        setActiveAccount(false)
+                    }
+                } else {
+                    console.log("No such user!");
+                    return null;
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching user data:", error)
+            });
+    }
+
     const loginUser = () => {
         signInWithEmailAndPassword(auth, loginEmail, loginPassword)
             .then((userCredential) => {
-                setCurrentView('content')
+                grabUserInfo(userCredential.user.uid);
             })
             .catch((error) => {
-                setInvalidLogin(true)
+                setInvalidLogin(true);
             });
     }
 
@@ -80,6 +109,11 @@ const LoginScreen = (props) => {
                     {
                         invalidLogin
                             ? <p className='error'>Email/Password don't match any records</p>
+                            : null 
+                    }
+                    {
+                        activeAccount === false
+                            ? <p className='error'>Account Suspended! Contact Admin</p>
                             : null 
                     }
                 </div>
@@ -134,8 +168,11 @@ const LoginScreen = (props) => {
         const userData = {
             userId: user.uid,
             email: user.email,
+            name: signupName,
             company: 'PHG',
             status: 'staff',
+            createdAt: new Date(),
+            type: 'active'
         }
         setDoc(userRef, userData)
             .then((response) => {
@@ -183,6 +220,16 @@ const LoginScreen = (props) => {
                         />
                 </div>
                 <div>
+                </div>
+                <div className='input-container'>
+                    <p className='label'>Full Name</p>
+                    <input 
+                        className='input'
+                        type="text" 
+                        placeholder="Full Name..." 
+                        value={signupName}
+                        onChange={handleSignupNameChange}
+                    />
                 </div>
                 <div className='input-container'>
                     <p className='label'>Password</p>

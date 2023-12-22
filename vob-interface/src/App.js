@@ -63,6 +63,9 @@ function App() {
         if (docSnap.exists()) {
           let access = docSnap.data();
           console.log("User data:", access.status);
+          if(access.type === 'suspended'){
+            signoutUser()
+          }
           setUserInfo(access)
           setuserAccess(access.status)
         } else {
@@ -198,11 +201,15 @@ function App() {
           </div>
           <div>
             {
-              userAccess === 'staff'
-                ? null
-                : <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
+              userAccess === 'admin'
+                ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
                     <p>Admin Panel</p>
                   </div>
+                : userAccess === 'owner'
+                    ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
+                        <p>Admin Panel</p>
+                      </div>
+                    : null
             }
             <div onClick={() => {signoutUser()}} className='menu-tab align-horizontally'>
               <p style={{color: 'red'}}>Logout</p>
@@ -251,7 +258,7 @@ function App() {
                                     ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                     : currentTab === 'billing'
                                         ? <MoreDetailTableComponent userAccess={userAccess} customersH={customersH}/>
-                                        : currentTab === 'admin'
+                                        : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner')
                                             ? <AdminPanel userInfo={userInfo}/>
                                             : null
 

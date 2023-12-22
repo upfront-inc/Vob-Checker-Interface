@@ -1,5 +1,5 @@
 import '../admin.css'
-import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
+import { collection, deleteDoc, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
 import React, { useEffect, useState } from 'react'
 import { db } from '../config/Firebase'
 
@@ -11,6 +11,7 @@ const AdminPanel = (props) => {
     const [userList, setUserList] = useState([])
     const [companyName, setCompanyName] = useState(userInfo.company)
     const [adminUsers, setAdminusers] = useState()
+    const [createUserTab, setCreateUserTab] = useState(false)
 
     useEffect(() => {
         getCompanyUsers()
@@ -48,34 +49,48 @@ const AdminPanel = (props) => {
             .catch((error) => console.error("Error updating user:", error));
     };
 
+    const deleteUserDocument = (userId) => {
+        const userRef = doc(db, 'users', userId);
+        updateDoc(userRef, { type: 'suspended' })
+            .then(() => console.log(`Admin ${userId} changed to staff`))
+            .catch((error) => console.error("Error updating user:", error));
+    };
+
     const displayResults = () => {
         return(
             <div className='content'>
                 {
                     userList.map((user) => {
                         return(
-                            <div className='item-row'>
-                                <div className='item-sub-row'>
-                                    <p >{user.data.email}</p>
-                                    <p>{user.data.status}</p>
-                                </div>
+                            <div>
                                 {
-                                    user.data.status === 'staff'
-                                        ? <div className='edit-container'>
-                                            <div>
-                                                <button onClick={() => {makeAdmin(user.data.userId)}}>Make Admin</button>
+                                    user.data.type === 'active'
+                                        ? <div className='item-row'>
+                                                <div className='item-sub-row'>
+                                                    <p >{user.data.email}</p>
+                                                    <p>{user.data.name}</p>
+                                                    <p>{user.data.status}</p>
+                                                </div>
+                                                {
+                                                    user.data.status === 'staff'
+                                                        ? <div className='edit-container'>
+                                                            <div>
+                                                                <button onClick={() => {makeAdmin(user.data.userId)}}>Make Admin</button>
+                                                            </div>
+                                                            <div style={{marginLeft: '8px'}}>
+                                                                <button onClick={() => {deleteUserDocument(user.data.userId)}}>X</button>
+                                                            </div>
+                                                        </div>
+                                                        : user.data.status === 'admin'
+                                                            ? <div>
+                                                                <button onClick={() => {removeAdmin(user.data.userId)}}>Remove Admin</button>
+                                                            </div>
+                                                            : user.data.status === 'owner'
+                                                                ? null
+                                                                : null
+                                                }
                                             </div>
-                                            <div style={{marginLeft: '8px'}}>
-                                                <button>X</button>
-                                            </div>
-                                        </div>
-                                        : user.data.status === 'admin'
-                                            ? <div>
-                                                <button onClick={() => {removeAdmin(user.data.userId)}}>Remove Admin</button>
-                                            </div>
-                                            : user.data.status === 'owner'
-                                                ? null
-                                                : null
+                                        : null
                                 }
                             </div>
                         )
