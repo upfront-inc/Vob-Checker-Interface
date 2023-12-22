@@ -9,8 +9,9 @@ import MoreDetailTableComponent from './components/MoreDetailTableComponent';
 import { auth, db } from './config/Firebase';
 import LoginScreen from './screens/LoginScreen';
 import { signOut } from 'firebase/auth';
-import { collection, doc, getDoc, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import AdminPanel from './components/AdminPanel';
+import ResultTableCompnent from './components/ResultTableComponent';
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Historical = 'https://www.telliref.com/api/v1/interface';
@@ -30,6 +31,7 @@ function App() {
 
   const [insruanceList, setInsruanceList] = useState([])
   const [billingList, setBillingList] = useState([])
+  const [activeSearch, setActiveSearhc] = useState(false)
 
   const [selectedOption, setSelectedOption] = useState('insurancePrefix');
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +48,7 @@ function App() {
       if (user) {
         setCurrentView('content');
         grabUserInfo();
-        grabCustomers();
+        grabInformation();
       } else {
         setCurrentView('login');
       }
@@ -56,7 +58,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    searchCurrentQuery()
+    searchQuery === ''
+      ? sortCurrentQuery()
+      : searchCurrentQuery()
   }, [sortOption])
 
   const grabUserInfo = () => {
@@ -83,37 +87,26 @@ function App() {
       });
   }
 
-  const grabCustomers = () => {
-    const requestConfig = {
-      url: API_BASE_URL_Local, 
-      method: 'get',  
-      headers: {
-        'Content-Type': 'application/json',  
-      },
-    };
-    const requestConfigH = {
-      url: API_BASE_URL_Local_Historical, 
-      method: 'get',  
-      headers: {
-        'Content-Type': 'application/json',  
-      },
-    };
-    axios.request(requestConfig)
-      .then(response => {
-        setCustomers(response.data)
-        sortInsurances(response.data)
-        axios.request(requestConfigH)
-          .then(response => {
-            setCustomersH(response.data)
-            setLoadingData(false)
-          })
-          .catch(error => {
-            console.log(error.message)
-          })
-      })
-      .catch(error => {
-        console.log(error.message)
-      })
+  const grabInformation = () => {
+    let queryRefInsruance;
+    let queryRefBilling;
+    queryRefInsruance = collection(db, 'CurrentInsurance')
+    queryRefBilling = collection(db, 'BillingDetails')
+    onSnapshot(queryRefInsruance, snapshot => {
+        let insurances = [];
+        snapshot.docs.forEach(doc => {
+          insurances.push({data: doc.data(), id: doc.id});
+        });
+        setInsruanceList(insurances)
+        sortInsurances(insurances)
+    });
+    onSnapshot(queryRefBilling, snapshot => {
+        let billings = [];
+        snapshot.docs.forEach(doc => {
+            billings.push({data: doc.data(), id: doc.id});
+        });
+        setBillingList(billings)
+    });
   }
 
   const sortInsurances = (insruances) => {
@@ -133,15 +126,16 @@ function App() {
         unknown.push(customer);
       }
     });
+
+    console.log(`aprroved length: ${approved.length}`)
+    console.log(`rejected length: ${rejected.length}`)
+    console.log(`unknown length: ${unknown.length}`)
+    console.log(`old length: ${old.length}`)
   
     setApprovedCustomers(approved);
     setRejectedCustomers(rejected);
     setUnknownCustomers(unknown);
     setOldCustomers(old)
-  }
-
-  const handleSelect = (e) => {
-    setSelectedOption(e.target.value);
   }
 
   const handleSearchChange = (e) => {
@@ -150,11 +144,13 @@ function App() {
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value)
-    searchCurrentQuery()
+    sortCurrentQuery()
   }
 
-  const searchCurrentQuery = () => {
+  const sortCurrentQuery = () => {
     console.log(`sort filter: ${sortOption}`)
+    setInsruanceList([])
+    setBillingList([])
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), orderBy(sortOption));
@@ -174,6 +170,36 @@ function App() {
         });
         setBillingList(billings)
     });
+  }
+
+  const searchCurrentQuery = () => {
+    setActiveSearhc(true)
+    let queryRefInsruance;
+    let queryRefBilling;
+    queryRefInsruance = query(collection(db, 'CurrentInsurance'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
+    queryRefBilling = query(collection(db, 'BillingDetails'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
+    onSnapshot(queryRefInsruance, snapshot => {
+        let insurances = [];
+        snapshot.docs.forEach(doc => {
+          insurances.push({data: doc.data(), id: doc.id});
+        });
+        setInsruanceList(insurances)
+        setCurrentTab('results')
+    });
+    onSnapshot(queryRefBilling, snapshot => {
+        let billings = [];
+        snapshot.docs.forEach(doc => {
+            billings.push({data: doc.data(), id: doc.id});
+        });
+        setBillingList(billings)
+    });
+  }
+
+  const clearSearch = () => {
+    grabInformation()
+    setActiveSearhc(false)
+    setSearchQuery('')
+    setCurrentTab('old')
   }
 
   const signoutUser = () => {
@@ -254,8 +280,13 @@ function App() {
                   value={searchQuery} 
                   onChange={handleSearchChange} 
                 />
-                <button style={{borderRadius:'8px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
-              </div>
+                <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
+                {
+                  activeSearch === true 
+                    ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
+                    : null 
+                }
+              </div> 
               <div className='sort-container'>
                 <p className='sort-header'>Sort: </p>
                 <select className='sort-select' value={sortOption} onChange={handleSortChange}>
@@ -270,15 +301,15 @@ function App() {
               loadingData === true
                 ? <p>Loading</p>
                 : currentTab === 'old'
-                    ? <TableCompnent list={oldCustomers} customersH={customersH}/>
+                    ? <TableCompnent list={oldCustomers}/>
                     : currentTab === 'yes'
-                        ? <TableCompnent list={approvedCustomers} customersH={customersH}/>
+                        ? <TableCompnent list={approvedCustomers}/>
                         : currentTab === 'no'
-                            ? <TableCompnent list={rejectedCustomers} customersH={customersH}/>
+                            ? <TableCompnent list={rejectedCustomers}/>
                             : currentTab === 'new'
-                                ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
+                                ? <TableCompnent list={unknownCustomers}/>
                                 : currentTab === 'results'
-                                    ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
+                                    ? <ResultTableCompnent list={insruanceList} customersH={billingList}/>
                                     : currentTab === 'billing'
                                         ? <MoreDetailTableComponent userAccess={userAccess} billingList={billingList}/>
                                         : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner')
