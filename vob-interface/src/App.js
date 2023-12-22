@@ -9,13 +9,14 @@ import MoreDetailTableComponent from './components/MoreDetailTableComponent';
 import { auth, db } from './config/Firebase';
 import LoginScreen from './screens/LoginScreen';
 import { signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import AdminPanel from './components/AdminPanel';
 
 const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Historical = 'https://www.telliref.com/api/v1/interface';
 const API_BASE_URL_Local = 'http://localhost:3010/api/v1/interface';
 const API_BASE_URL_Local_Historical = 'http://localhost:3010/api/v1/interface-historical';
+const API_BASE_URL_Local_SORT = 'http://localhost:3010/api/v1/interface-sort';
 
 function App() {
   const [customers, setCustomers] = useState([])
@@ -26,6 +27,9 @@ function App() {
   const [unknownCustomers, setUnknownCustomers] = useState([])
   const [currentTab, setCurrentTab] = useState('old')
   const [loadingData, setLoadingData] = useState('true')
+
+  const [insruanceList, setInsruanceList] = useState([])
+  const [billingList, setBillingList] = useState([])
 
   const [selectedOption, setSelectedOption] = useState('insurancePrefix');
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,7 +101,7 @@ function App() {
     axios.request(requestConfig)
       .then(response => {
         setCustomers(response.data)
-        sortCustomers(response.data)
+        sortInsurances(response.data)
         axios.request(requestConfigH)
           .then(response => {
             setCustomersH(response.data)
@@ -112,13 +116,13 @@ function App() {
       })
   }
 
-  const sortCustomers = (customerList) => {
+  const sortInsurances = (insruances) => {
     let old = [];
     let approved = [];
     let rejected = [];
     let unknown = [];
   
-    customerList.forEach(customer => {
+    insruances.forEach(customer => {
       if (customer.data.vob === "yes") {
         approved.push(customer);
         old.push(customer)
@@ -146,11 +150,30 @@ function App() {
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value)
+    searchCurrentQuery()
   }
 
   const searchCurrentQuery = () => {
-    let newUrl = API_BASE_URL_Local 
-    
+    console.log(`sort filter: ${sortOption}`)
+    let queryRefInsruance;
+    let queryRefBilling;
+    queryRefInsruance = query(collection(db, 'CurrentInsurance'), orderBy(sortOption));
+    queryRefBilling = query(collection(db, 'BillingDetails'), orderBy(sortOption));
+    onSnapshot(queryRefInsruance, snapshot => {
+        let insurances = [];
+        snapshot.docs.forEach(doc => {
+          insurances.push({data: doc.data(), id: doc.id});
+        });
+        setInsruanceList(insurances)
+        sortInsurances(insurances)
+    });
+    onSnapshot(queryRefBilling, snapshot => {
+        let billings = [];
+        snapshot.docs.forEach(doc => {
+            billings.push({data: doc.data(), id: doc.id});
+        });
+        setBillingList(billings)
+    });
   }
 
   const signoutUser = () => {
@@ -257,7 +280,7 @@ function App() {
                                 : currentTab === 'results'
                                     ? <TableCompnent list={unknownCustomers} customersH={customersH}/>
                                     : currentTab === 'billing'
-                                        ? <MoreDetailTableComponent userAccess={userAccess} customersH={customersH}/>
+                                        ? <MoreDetailTableComponent userAccess={userAccess} billingList={billingList}/>
                                         : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner')
                                             ? <AdminPanel userInfo={userInfo}/>
                                             : null

@@ -3,7 +3,7 @@ import { auth } from '../config/Firebase'
 
 const MoreDetailTableComponent = (props) => {
     const {
-        customersH,
+        billingList,
         userAccess
     } = props
 
@@ -53,11 +53,11 @@ const MoreDetailTableComponent = (props) => {
                 </tr>
                 </thead>
                 <tbody>
-                {customersH.map((customer, index) => (
+                {billingList.map((customer, index) => (
                     <tr key={index}>
-                    <td>{customer.data.insuranceCompany}</td>
+                    <td>{customer.data.insuranceName}</td>
                     <td>{customer.data.policyNumber}</td>
-                    <td>{customer.data.prefix}</td>
+                    <td>{customer.data.insurancePrefix}</td>
                     {
                         customer.data.ResidentialDays === undefined
                             ? <td>--</td>
