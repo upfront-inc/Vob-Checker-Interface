@@ -17,9 +17,9 @@ import ResultTableCompnent from './components/ResultTableComponent';
 function App() {
   const [approvedCustomers, setApprovedCustomers] = useState([])
   const [rejectedCustomers, setRejectedCustomers] = useState([])
-  const [oldCustomers, setOldCustomers] = useState([])
+  const [existingCustomers, setexistingCustomers] = useState([])
   const [unknownCustomers, setUnknownCustomers] = useState([])
-  const [currentTab, setCurrentTab] = useState('old')
+  const [currentTab, setCurrentTab] = useState('existing')
   const [loadingData, setLoadingData] = useState('true')
 
   const [insruanceList, setInsruanceList] = useState([])
@@ -89,7 +89,6 @@ function App() {
           insurances.push({data: doc.data(), id: doc.id});
         });
         setInsruanceList(insurances)
-        sortInsurances(insurances)
     });
     onSnapshot(queryRefBilling, snapshot => {
         let billings = [];
@@ -100,29 +99,29 @@ function App() {
     });
   }
 
-  const sortInsurances = (insruances) => {
-    let old = [];
-    let approved = [];
-    let rejected = [];
-    let unknown = [];
+  // const sortInsurances = (insruances) => {
+  //   let existing = [];
+  //   let approved = [];
+  //   let rejected = [];
+  //   let unknown = [];
   
-    insruances.forEach(customer => {
-      if (customer.data.vob === "yes") {
-        approved.push(customer);
-        old.push(customer)
-      } else if (customer.data.vob === "no") {
-        rejected.push(customer);
-        old.push(customer)
-      } else if (customer.data.vob === "unknown") {
-        unknown.push(customer);
-      }
-    });
+  //   insruances.forEach(customer => {
+  //     if (customer.data.vob === "yes") {
+  //       approved.push(customer);
+  //       existing.push(customer)
+  //     } else if (customer.data.vob === "no") {
+  //       rejected.push(customer);
+  //       existing.push(customer)
+  //     } else if (customer.data.vob === "unknown") {
+  //       unknown.push(customer);
+  //     }
+  //   });
   
-    setApprovedCustomers(approved);
-    setRejectedCustomers(rejected);
-    setUnknownCustomers(unknown);
-    setOldCustomers(old)
-  }
+  //   setApprovedCustomers(approved);
+  //   setRejectedCustomers(rejected);
+  //   setUnknownCustomers(unknown);
+  //   setexistingCustomers(existing)
+  // }
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -146,7 +145,6 @@ function App() {
         insurances.push({data: doc.data(), id: doc.id});
       });
       setInsruanceList(insurances)
-      sortInsurances(insurances)
     });
     onSnapshot(queryRefBilling, snapshot => {
       let billings = [];
@@ -184,7 +182,7 @@ function App() {
     grabInformation()
     setActiveSearhc(false)
     setSearchQuery('')
-    setCurrentTab('old')
+    setCurrentTab('existing')
   }
 
   const signoutUser = () => {
@@ -205,10 +203,10 @@ function App() {
             <div className='header'>
               <img style={{height: '57px', width: '170px'}} src={image} alt='Intellisurance logo'/>
             </div>
-            {
-              currentTab === 'old' || currentTab === 'yes' || currentTab === 'no' || currentTab === 'new'
+            {/* {
+              currentTab === 'existing' || currentTab === 'yes' || currentTab === 'no' || currentTab === 'new'
                 ? <div>
-                    <div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
+                    <div onClick={() => {setCurrentTab('existing')}} className='menu-tab align-horizontally'>
                       <p>Existing Policies</p>
                       <FontAwesomeIcon icon={faChevronUp} />
                     </div>
@@ -224,11 +222,13 @@ function App() {
                       <p className='menu-text'>Unknown Insurances</p>
                     </div>
                   </div>
-                : <div onClick={() => {setCurrentTab('old')}} className='menu-tab align-horizontally'>
+                : <div onClick={() => {setCurrentTab('existing')}} className='menu-tab align-horizontally'>
                     <p>Existing Policies</p>
-                    <FontAwesomeIcon icon={faChevronDown} />
                   </div>
-            }
+            } */}
+            <div onClick={() => {setCurrentTab('existing')}} className='menu-tab align-horizontally'>
+              <p>Existing Policies</p>
+            </div>
             <div onClick={() => {setCurrentTab('billing')}} className='menu-tab'>
               <p>Billing Details</p>
             </div>
@@ -245,6 +245,9 @@ function App() {
                       </div>
                     : null
             }
+            <div onClick={() => {}} className='menu-tab align-horizontally'>
+              <p>Support</p>
+            </div>
             <div onClick={() => {signoutUser()}} className='menu-tab align-horizontally'>
               <p style={{color: 'red'}}>Logout</p>
             </div>
@@ -261,7 +264,7 @@ function App() {
                 <input 
                   className='input'
                   type="text" 
-                  placeholder="Search Prefix..." 
+                  placehexistinger="Search Prefix..." 
                   value={searchQuery} 
                   onChange={handleSearchChange} 
                 />
@@ -283,23 +286,20 @@ function App() {
           </div>
           <div className='content-container'>
             {
+              console.log(currentTab)
+            }
+            {
               loadingData === true
                 ? <p>Loading</p>
-                : currentTab === 'old'
-                    ? <TableCompnent list={oldCustomers}/>
-                    : currentTab === 'yes'
-                        ? <TableCompnent list={approvedCustomers}/>
-                        : currentTab === 'no'
-                            ? <TableCompnent list={rejectedCustomers}/>
-                            : currentTab === 'new'
-                                ? <TableCompnent list={unknownCustomers}/>
-                                : currentTab === 'results'
-                                    ? <ResultTableCompnent list={insruanceList} customersH={billingList}/>
-                                    : currentTab === 'billing'
-                                        ? <MoreDetailTableComponent userAccess={userAccess} billingList={billingList}/>
-                                        : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner')
-                                            ? <AdminPanel userInfo={userInfo}/>
-                                            : null
+                : currentTab === 'existing'
+                    ? <TableCompnent list={insruanceList}/>
+                    : currentTab === 'results'
+                        ? <ResultTableCompnent list={insruanceList} customersH={billingList}/>
+                        : currentTab === 'billing'
+                            ? <MoreDetailTableComponent userAccess={userAccess} billingList={billingList}/>
+                            : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner')
+                                ? <AdminPanel userInfo={userInfo}/>
+                                : null
 
             }
           </div>

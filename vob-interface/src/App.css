@@ -109,14 +109,14 @@
 
 .table-container {
   overflow-y: auto;
-  height: 90vh;
+  height: 88vh;
   width: 86vw; 
   margin-bottom: 16px;
 }
 
 .table-container-half {
   overflow-y: auto;
-  height: 48;
+  height: 48vh;
   width: 86vw; 
   margin-bottom: 16px;
 }
