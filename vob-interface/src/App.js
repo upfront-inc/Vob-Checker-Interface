@@ -1,6 +1,7 @@
+// transfer ownership option
+
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import image from './assets/logo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
@@ -13,15 +14,7 @@ import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from 'fire
 import AdminPanel from './components/AdminPanel';
 import ResultTableCompnent from './components/ResultTableComponent';
 
-const API_BASE_URL = 'https://www.telliref.com/api/v1/interface';
-const API_BASE_URL_Historical = 'https://www.telliref.com/api/v1/interface';
-const API_BASE_URL_Local = 'http://localhost:3010/api/v1/interface';
-const API_BASE_URL_Local_Historical = 'http://localhost:3010/api/v1/interface-historical';
-const API_BASE_URL_Local_SORT = 'http://localhost:3010/api/v1/interface-sort';
-
 function App() {
-  const [customers, setCustomers] = useState([])
-  const [customersH, setCustomersH] = useState([])
   const [approvedCustomers, setApprovedCustomers] = useState([])
   const [rejectedCustomers, setRejectedCustomers] = useState([])
   const [oldCustomers, setOldCustomers] = useState([])
@@ -33,7 +26,6 @@ function App() {
   const [billingList, setBillingList] = useState([])
   const [activeSearch, setActiveSearhc] = useState(false)
 
-  const [selectedOption, setSelectedOption] = useState('insurancePrefix');
   const [searchQuery, setSearchQuery] = useState('');
 
   const [sortOption, setSortOption] = useState('insuranceName')
@@ -70,14 +62,13 @@ function App() {
       .then((docSnap) => {
         if (docSnap.exists()) {
           let access = docSnap.data();
-          console.log("User data:", access.status);
           if(access.type === 'suspended'){
             signoutUser()
           }
           setUserInfo(access)
           setuserAccess(access.status)
         } else {
-          console.log("No such user!");
+          console.error("No such user!");
           return null;
         }
       })
@@ -126,11 +117,6 @@ function App() {
         unknown.push(customer);
       }
     });
-
-    console.log(`aprroved length: ${approved.length}`)
-    console.log(`rejected length: ${rejected.length}`)
-    console.log(`unknown length: ${unknown.length}`)
-    console.log(`old length: ${old.length}`)
   
     setApprovedCustomers(approved);
     setRejectedCustomers(rejected);
@@ -148,7 +134,6 @@ function App() {
   }
 
   const sortCurrentQuery = () => {
-    console.log(`sort filter: ${sortOption}`)
     setInsruanceList([])
     setBillingList([])
     let queryRefInsruance;
@@ -156,19 +141,19 @@ function App() {
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), orderBy(sortOption));
     queryRefBilling = query(collection(db, 'BillingDetails'), orderBy(sortOption));
     onSnapshot(queryRefInsruance, snapshot => {
-        let insurances = [];
-        snapshot.docs.forEach(doc => {
-          insurances.push({data: doc.data(), id: doc.id});
-        });
-        setInsruanceList(insurances)
-        sortInsurances(insurances)
+      let insurances = [];
+      snapshot.docs.forEach(doc => {
+        insurances.push({data: doc.data(), id: doc.id});
+      });
+      setInsruanceList(insurances)
+      sortInsurances(insurances)
     });
     onSnapshot(queryRefBilling, snapshot => {
-        let billings = [];
-        snapshot.docs.forEach(doc => {
-            billings.push({data: doc.data(), id: doc.id});
-        });
-        setBillingList(billings)
+      let billings = [];
+      snapshot.docs.forEach(doc => {
+          billings.push({data: doc.data(), id: doc.id});
+      });
+      setBillingList(billings)
     });
   }
 
@@ -179,19 +164,19 @@ function App() {
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
     queryRefBilling = query(collection(db, 'BillingDetails'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
     onSnapshot(queryRefInsruance, snapshot => {
-        let insurances = [];
-        snapshot.docs.forEach(doc => {
-          insurances.push({data: doc.data(), id: doc.id});
-        });
-        setInsruanceList(insurances)
-        setCurrentTab('results')
+      let insurances = [];
+      snapshot.docs.forEach(doc => {
+        insurances.push({data: doc.data(), id: doc.id});
+      });
+      setInsruanceList(insurances)
+      setCurrentTab('results')
     });
     onSnapshot(queryRefBilling, snapshot => {
-        let billings = [];
-        snapshot.docs.forEach(doc => {
-            billings.push({data: doc.data(), id: doc.id});
-        });
-        setBillingList(billings)
+      let billings = [];
+      snapshot.docs.forEach(doc => {
+          billings.push({data: doc.data(), id: doc.id});
+      });
+      setBillingList(billings)
     });
   }
 
@@ -204,12 +189,12 @@ function App() {
 
   const signoutUser = () => {
     signOut(auth)
-      .then(() => {
-          setCurrentView('login')
-      })
-      .catch((error) => {
-          console.error("Error signing out:", error);
-      });
+    .then(() => {
+      setCurrentView('login')
+    })
+    .catch((error) => {
+      console.error("Error signing out:", error);
+    });
   }
 
   const displayContent = () => {
