@@ -13,6 +13,7 @@ import { signOut } from 'firebase/auth';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import AdminPanel from './components/AdminPanel';
 import ResultTableCompnent from './components/ResultTableComponent';
+import SupportPanel from './components/SupportPanel';
 
 function App() {
   const [approvedCustomers, setApprovedCustomers] = useState([])
@@ -235,6 +236,13 @@ function App() {
           </div>
           <div>
             {
+              userAccess === 'Dev'
+                ? <div onClick={() => {setCurrentTab('support')}} className='menu-tab align-horizontally'>
+                    <p>Dev Support</p>
+                  </div>
+                : null
+            }
+            {
               userAccess === 'admin'
                 ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
                     <p>Admin Panel</p>
@@ -243,9 +251,13 @@ function App() {
                     ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
                         <p>Admin Panel</p>
                       </div>
-                    : null
+                    : userAccess === 'Dev'
+                        ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
+                            <p>Admin Panel</p>
+                          </div>
+                        : null
             }
-            <div onClick={() => {}} className='menu-tab align-horizontally'>
+            <div onClick={() => {setCurrentTab('support')}} className='menu-tab align-horizontally'>
               <p>Support</p>
             </div>
             <div onClick={() => {signoutUser()}} className='menu-tab align-horizontally'>
@@ -258,32 +270,38 @@ function App() {
           </div>
         </div>
         <div className='content'>
-          <div className='top-bar'>
-            <div className='bottom-bar'>
-              <div className='search-bar'>
-                <input 
-                  className='input'
-                  type="text" 
-                  placehexistinger="Search Prefix..." 
-                  value={searchQuery} 
-                  onChange={handleSearchChange} 
-                />
-                <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
-                {
-                  activeSearch === true 
-                    ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
-                    : null 
-                }
-              </div> 
-              <div className='sort-container'>
-                <p className='sort-header'>Sort: </p>
-                <select className='sort-select' value={sortOption} onChange={handleSortChange}>
-                  <option value="insuranceName">Insurance Name</option>
-                  <option value="insurancePrefix">Insurance Prefix</option>
-                </select>
-              </div>
-            </div>
-          </div>
+          {
+            currentTab === 'admin'
+              ? null 
+              : currentTab === 'support'
+                  ? null 
+                  : <div className='top-bar'>
+                      <div className='bottom-bar'>
+                        <div className='search-bar'>
+                          <input 
+                            className='input'
+                            type="text" 
+                            placehexistinger="Search Prefix..." 
+                            value={searchQuery} 
+                            onChange={handleSearchChange} 
+                          />
+                          <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
+                          {
+                            activeSearch === true 
+                              ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
+                              : null 
+                          }
+                        </div> 
+                        <div className='sort-container'>
+                          <p className='sort-header'>Sort: </p>
+                          <select className='sort-select' value={sortOption} onChange={handleSortChange}>
+                            <option value="insuranceName">Insurance Name</option>
+                            <option value="insurancePrefix">Insurance Prefix</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+          }
           <div className='content-container'>
             {
               console.log(currentTab)
@@ -297,9 +315,11 @@ function App() {
                         ? <ResultTableCompnent list={insruanceList} customersH={billingList}/>
                         : currentTab === 'billing'
                             ? <MoreDetailTableComponent userAccess={userAccess} billingList={billingList}/>
-                            : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner')
-                                ? <AdminPanel userInfo={userInfo}/>
-                                : null
+                            : currentTab === 'support'
+                                ? <SupportPanel />
+                                : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner' || userAccess === 'Dev')
+                                    ? <AdminPanel userInfo={userInfo}/>
+                                    : null
 
             }
           </div>
