@@ -11,7 +11,6 @@ const AdminPanel = (props) => {
     const [userList, setUserList] = useState([])
     const [companyName, setCompanyName] = useState(userInfo.company)
     const [adminUsers, setAdminusers] = useState()
-    const [createUserTab, setCreateUserTab] = useState(false)
 
     useEffect(() => {
         getCompanyUsers()
@@ -62,56 +61,60 @@ const AdminPanel = (props) => {
         }
     };
 
-    const displayResults = () => {
+    const displayPanel = () => {
         return(
-            <div className='content'>
-                {
-                    userList.map((user) => {
-                        return(
-                            <div>
-                                {
-                                    user.data.type === 'active'
-                                        ? <div className='item-row'>
-                                                <div className='item-sub-row'>
-                                                    <p >{user.data.email}</p>
-                                                    <p>{user.data.name}</p>
-                                                    <p>{user.data.status}</p>
-                                                </div>
-                                                {
-                                                    user.data.status === 'staff'
-                                                        ? <div className='edit-container'>
-                                                            <div>
-                                                                <button onClick={() => {makeAdmin(user.data.userId)}}>Make Admin</button>
-                                                            </div>
-                                                            <div style={{marginLeft: '8px'}}>
-                                                                <button onClick={() => {deleteUserDocument(user.data.userId)}}>X</button>
-                                                            </div>
-                                                        </div>
-                                                        : user.data.status === 'admin'
-                                                            ? <div>
-                                                                <button onClick={() => {removeAdmin(user.data.userId)}}>Remove Admin</button>
-                                                            </div>
-                                                            : user.data.status === 'owner'
-                                                                ? null
-                                                                : null
-                                                }
-                                            </div>
-                                        : null
-                                }
-                            </div>
-                        )
-                    })
-                }
+            <div>
+            <div className="table-container-admin hide-scrollbar">
+            <table className='table-content'>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Priviledges</th>
+                    <th>Remove</th>
+                </tr>
+                </thead>
+                <tbody>
+                {userList.map((customer, index) => (
+                    <tr key={index}>
+                    <td>{customer.data.name}</td>
+                    <td>{customer.data.email}</td>
+                    <td>{customer.data.status}</td>
+                    {
+                        customer.data.status === 'staff'
+                            ? <td>
+                                <button className='made-admin' onClick={() => {makeAdmin(customer.data.userId)}}>Make Admin</button>
+                            </td>
+                            : customer.data.status === 'admin'
+                                ? <td>
+                                    <button onClick={() => {removeAdmin(customer.data.userId)}}>Remove Admin</button>
+                                </td>
+                                : customer.data.status === 'owner'
+                                    ? <td></td>
+                                    : <td></td>
+                    }
+                    {
+                        customer.data.status === 'staff'
+                            ? <td>
+                                <button style={{color: '#e94f4e'}} onClick={() => {deleteUserDocument(customer.data.userId)}}>Delete User</button>
+                            </td>
+                            : <td></td>
+                    }
+                    </tr>
+                ))}
+                </tbody>
+            </table>
             </div>
+        </div>
         )
     }
 
     return (
         <div className='admin-panel'>
-            <div className='admin-header'>AdminPanel - {companyName}</div>
             {
                 userList.length > 0
-                    ? displayResults()
+                    ? displayPanel()
                     : null
             }
         </div>

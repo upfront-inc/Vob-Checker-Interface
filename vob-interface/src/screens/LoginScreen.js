@@ -1,5 +1,5 @@
 import '../login.css'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
 import { auth, db } from '../config/Firebase'
 import { doc, getDoc } from 'firebase/firestore'
@@ -20,12 +20,19 @@ const LoginScreen = (props) => {
 
     const [activeAccount, setActiveAccount] = useState(true)
 
+    const [resetEmail, setResetEmail] = useState()
+    const [resettingPassword, setResettingPassword] = useState(false)
+
     const handleLoginEmailChange = (e) => {
         setLoginEmail(e.target.value)
     }
 
     const handleLoginPasswordChange = (e) => {
         setLoginPassword(e.target.value);
+    }
+
+    const handleResetEmailChange = (e) => {
+        setResetEmail(e.target.value);
     }
 
     const grabUserInfo = (userId) => {
@@ -48,6 +55,17 @@ const LoginScreen = (props) => {
             .catch((error) => {
                 console.error("Error fetching user data:", error)
             });
+    }
+
+    const resetPasswordForUser = () => {
+        sendPasswordResetEmail(auth, resetEmail.toLowerCase())
+        .then(response => {
+            console.log('email reset password sent')
+            setResettingPassword(false)
+        })
+        .catch(error => {
+            console.log(error)
+        })
     }
 
     const loginUser = () => {
@@ -76,30 +94,51 @@ const LoginScreen = (props) => {
                             : null 
                     }
                 </div>
-                <div className='input-container'>
-                    <p className='label'>Email</p>
-                    <input 
-                        className='input'
-                        type="text" 
-                        placeholder="email..."
-                        value={loginEmail}
-                        onChange={handleLoginEmailChange} 
-                    />
-                </div>
-                <div className='input-container'>
-                    <p className='label'>Password</p>
-                    <input 
-                        className='input'
-                        type="password" 
-                        placeholder="password..." 
-                        value={loginPassword}
-                        onChange={handleLoginPasswordChange}
-                        />
-                </div>
-                <div className='buttons-container'>
-                    <button className='button' onClick={() => {loginUser()}}>Login</button>
-                    <button className='button' onClick={() => {setCurrentTab('Signup')}}>Signup</button>
-                </div>
+                {
+                    resettingPassword
+                        ? <div>
+                            <div className='input-container'>
+                                <p className='label'>Confirm Email</p>
+                                <input 
+                                    className='input'
+                                    type="text" 
+                                    placeholder="email..."
+                                    value={resetEmail}
+                                    onChange={handleResetEmailChange} 
+                                />
+                            </div>
+                            <div className='buttons-container'>
+                                <button className='button' onClick={() => {resetPasswordForUser()}}>Reset Password</button>
+                            </div>
+                        </div>
+                        : <div>
+                            <div className='input-container'>
+                                <p className='label'>Email</p>
+                                <input 
+                                    className='input'
+                                    type="text" 
+                                    placeholder="email..."
+                                    value={loginEmail}
+                                    onChange={handleLoginEmailChange} 
+                                />
+                            </div>
+                            <div className='input-container'>
+                                <p className='label'>Password</p>
+                                <input 
+                                    className='input'
+                                    type="password" 
+                                    placeholder="password..." 
+                                    value={loginPassword}
+                                    onChange={handleLoginPasswordChange}
+                                />
+                                <p style={{fontSize: '12px', marginTop: '4px', color: 'blue'}} onClick={() => {setResettingPassword(!resettingPassword)}}>Forgot Password</p>
+                            </div>
+                            <div className='buttons-container'>
+                                <button className='button' onClick={() => {loginUser()}}>Login</button>
+                                <button className='button' onClick={() => {setCurrentTab('Signup')}}>Signup</button>
+                            </div>
+                        </div>
+                }
             </div>
         )
     }

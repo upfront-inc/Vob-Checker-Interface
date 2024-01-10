@@ -6,6 +6,7 @@
   align-items: flex-start;
   color: black;
   margin-top: 0px;
+  font-family: 'Varela Round', sans-serif;
 }
 
 .container {
@@ -15,9 +16,9 @@
 }
 
 .side-bar {
-  flex: 0 0 225px; 
+  flex: 0 0 225px;
   display: flex;
-  background-color: #f7f7f7;
+  background-color: #E5E4E2;
   border-right: 2px solid lightgrey;
   height: 100%;
   flex-direction: column;
@@ -31,13 +32,10 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  border-bottom: 2px solid #e5e5e5;
 }
 
 .menu-tab {
-  background-color: white;
-  padding: 16px;
-  border-bottom: 2px solid #e5e5e5;
+  padding: 12px;
   font-weight: bold;
 }
 
@@ -67,8 +65,7 @@
 
 .bottom-legal {
   padding-top: 18px;
-  padding-bottom: 12px;;
-  border-top: 2px solid #e5e5e5;
+  padding-bottom: 12px;
 }
 
 .legal-disclaimer {
@@ -99,6 +96,35 @@
   align-items: center;
 }
 
+.facility-tab {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.facility-header {
+  font-size: 18px;
+  margin-right: 16px;
+  font-weight: 600;
+}
+
+.facility-text {
+  padding: 12px;
+  background-color: #f3faff;
+  margin-right: 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.bottom-bar-side {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .content-container {
   width: 100%;
   display: flex;
@@ -108,32 +134,66 @@
 }
 
 .table-container {
-  overflow-y: auto;
+  overflow-y: scroll;
   height: 88vh;
-  width: 86vw; 
+  width: 86vw;
+  margin-bottom: 16px;
+}
+
+.table-container-details {
+  overflow-y: scroll;
+  height: 86vh;
+  width: 86vw;
   margin-bottom: 16px;
 }
 
 .table-container-half {
   overflow-y: auto;
-  height: 48vh;
-  width: 86vw; 
+  height: 43vh;
+  width: 86vw;
+  margin-bottom: 16px;
+}
+
+.table-container-admin {
+  overflow-y: auto;
+  height: 94vh;
+  width: 86vw;
   margin-bottom: 16px;
 }
 
 .table-content {
   width: 100%;
   height: 50%;
+  border-collapse: collapse;
 }
 
-.table-container table tr:nth-child(odd) {
-  background-color: #f2f2f2; /* Light grey color for odd rows */
+.table-content th {
+  position: sticky;
+  top: 0;
+  background-color: #f3faff;
+  color: black;
+  border: none;
+  text-align: center;
+  padding: 24px 8px;
+  color: black;
+  font-weight: 'bold';
+  font-size: 16px;
+}
+
+.table-content td {
+  border: none;
+  text-align: center;
+  font-weight: 500;
+  padding: 24px 8px;
+  font-size: 14px;
+  /* 16px vertical padding */
 }
 
 .search-bar {
   width: 100%;
   display: flex;
   flex-direction: row;
+  margin-right: 24px;
 }
 
 .select-container {
@@ -162,14 +222,14 @@
   font-weight: bold;
 }
 
-.input {
+input {
   width: 30%;
   padding: 4px;
   font-size: 14px;
   margin-left: 8px;
   margin-right: 8px;
-  border: 0;
-  border-bottom: 2px solid black;
+  background-color: grey;
+  border: 1px solid grey;
 }
 
 .menuItem {
@@ -191,23 +251,11 @@
   flex-direction: row;
 }
 
-/* table {
-  width: 100%;
-  height: 30vh;
-  border-collapse: collapse;
-} */
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
+th,
+td {
+  border: 1px solid grey;
   text-align: left;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-th {
-  color: white;
-  background-color: grey;
+  font-size: 16px;
 }
 
 p {

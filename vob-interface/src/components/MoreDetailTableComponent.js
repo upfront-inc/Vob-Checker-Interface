@@ -1,15 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { auth } from '../config/Firebase'
 
 const MoreDetailTableComponent = (props) => {
     const {
         billingList,
-        userAccess
+        userAccess,
+        showTab,
+        affinityRecords,
+        beachsideRecords,
+        axisRecords
     } = props
 
     const formatDollarAmount = (str) => {
         const num = parseFloat(str);
         return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    const limitString = (str) => {
+        if (str.length > 30) {
+            return str.substring(0, 30) + '...';
+        } else {
+            return str;
+        }
     }
 
     const showDetails = (customer) => {
@@ -18,29 +30,32 @@ const MoreDetailTableComponent = (props) => {
                 <td>{formatDollarAmount(customer.data.totalCharges)}</td>
                 {
                     customer.data.totalPaid >= 30000
-                        ? <td style={{backgroundColor: '#50c878'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                        ? <td style={{color: '#50c878', fontWeight: 600}}>{formatDollarAmount(customer.data.totalPaid)}</td>
                         : customer.data.totalPaid  > 0
-                            ? <td style={{backgroundColor: '#ff5733'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
-                            : <td>{formatDollarAmount(customer.data.totalPaid)}</td>
+                            ? <td style={{color:'#e94f4e', fontWeight: 600}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                            : <td style={{fontWeight: 600}}>{formatDollarAmount(customer.data.totalPaid)}</td>
                 }
             </>
         )
     }
 
     return (
-        <div className="table-container hide-scrollbar">
+        <div className="table-container-details hide-scrollbar">
             <table className='table-content'>
                 <thead>
                 <tr>
-                    <th>Insurance</th>
-                    <th>Policy</th>
                     <th>Prefix</th>
+                    <th>Insurance</th>
+                    <th>Name</th>
+                    <th>Network</th>
+                    {/* <th>Policy</th> */}
                     <th>Residential</th>
                     <th>Detox</th>
+                    <th>Facility</th>
                     {
                         userAccess === 'staff'
-                            ? null
-                            : <th>Total Charges</th>
+                        ? null
+                        : <th>Total Charges</th>
                     }
                     {
                         userAccess === 'staff'
@@ -48,44 +63,120 @@ const MoreDetailTableComponent = (props) => {
                         : <th>Total Paid</th>
                     }
                     <th>Payout Ratio</th>
-                    <th>Facility</th>
-                    <th>Network</th>
                 </tr>
                 </thead>
                 <tbody>
-                {billingList.map((customer, index) => (
-                    <tr key={index}>
-                    <td>{customer.data.insuranceName}</td>
-                    <td>{customer.data.policyNumber}</td>
-                    <td>{customer.data.insurancePrefix}</td>
                     {
-                        customer.data.ResidentialDays === undefined
-                            ? <td>--</td>
-                            : <td>{customer.data.ResidentialDays} Days</td>
+                        showTab === 'full'
+                            ? billingList.map((customer, index) => (
+                                <tr key={index}>
+                                <td style={{fontWeight: 600}}>{customer.data.prefix}</td>
+                                <td title={customer.data.insuranceName}>{limitString(customer.data.insuranceName)}</td>
+                                <td>{customer.data.patientName}</td>
+                                <td>{customer.data.network}</td>
+                                {/* <td>{customer.data.policyNumber}</td> */}
+                                {
+                                    customer.data.ResidentialDays === undefined
+                                        ? <td>--</td>
+                                        : <td>{Math.round(customer.data.ResidentialDays)} Days</td>
+                                }
+                                {
+                                    customer.data.DetoxDays === undefined
+                                    ? <td>--</td>
+                                    : <td>{Math.round(customer.data.DetoxDays)} Days</td>
+                                }
+                                <td>{customer.data.facility}</td>
+                                {
+                                    userAccess === 'staff'
+                                        ? null 
+                                        : showDetails(customer)
+                                }
+                                <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                </tr>
+                            ))
+                            : showTab === 'affinity'
+                                ? affinityRecords.map((customer, index) => (
+                                    <tr key={index}>
+                                    <td style={{fontWeight: 600}}>{customer.data.prefix}</td>
+                                    <td title={customer.data.insuranceName}>{limitString(customer.data.insuranceName)}</td>
+                                    <td>{customer.data.patientName}</td>
+                                    <td>{customer.data.network}</td>
+                                    {/* <td>{customer.data.policyNumber}</td> */}
+                                    {
+                                        customer.data.ResidentialDays === undefined
+                                            ? <td>--</td>
+                                            : <td>{Math.round(customer.data.ResidentialDays)} Days</td>
+                                    }
+                                    {
+                                        customer.data.DetoxDays === undefined
+                                        ? <td>--</td>
+                                        : <td>{Math.round(customer.data.DetoxDays)} Days</td>
+                                    }
+                                    <td>{customer.data.facility}</td>
+                                    {
+                                        userAccess === 'staff'
+                                            ? null 
+                                            : showDetails(customer)
+                                    }
+                                    <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                    </tr>
+                                ))
+                                : showTab === 'beachside'
+                                    ? beachsideRecords.map((customer, index) => (
+                                        <tr key={index}>
+                                        <td style={{fontWeight: 600}}>{customer.data.prefix}</td>
+                                        <td title={customer.data.insuranceName}>{limitString(customer.data.insuranceName)}</td>
+                                        <td>{customer.data.patientName}</td>
+                                        <td>{customer.data.network}</td>
+                                        {/* <td>{customer.data.policyNumber}</td> */}
+                                        {
+                                            customer.data.ResidentialDays === undefined
+                                                ? <td>--</td>
+                                                : <td>{Math.round(customer.data.ResidentialDays)} Days</td>
+                                        }
+                                        {
+                                            customer.data.DetoxDays === undefined
+                                            ? <td>--</td>
+                                            : <td>{Math.round(customer.data.DetoxDays)} Days</td>
+                                        }
+                                        <td>{customer.data.facility}</td>
+                                        {
+                                            userAccess === 'staff'
+                                                ? null 
+                                                : showDetails(customer)
+                                        }
+                                        <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                        </tr>
+                                    ))
+                                    : showTab === 'axis'
+                                        ? axisRecords.map((customer, index) => (
+                                            <tr key={index}>
+                                            <td style={{fontWeight: 600}}>{customer.data.prefix}</td>
+                                            <td title={customer.data.insuranceName}>{limitString(customer.data.insuranceName)}</td>
+                                            <td>{customer.data.patientName}</td>
+                                            <td>{customer.data.network}</td>
+                                            {/* <td>{customer.data.policyNumber}</td> */}
+                                            {
+                                                customer.data.ResidentialDays === undefined
+                                                    ? <td>--</td>
+                                                    : <td>{Math.round(customer.data.ResidentialDays)} Days</td>
+                                            }
+                                            {
+                                                customer.data.DetoxDays === undefined
+                                                ? <td>--</td>
+                                                : <td>{Math.round(customer.data.DetoxDays)} Days</td>
+                                            }
+                                            <td>{customer.data.facility}</td>
+                                            {
+                                                userAccess === 'staff'
+                                                    ? null 
+                                                    : showDetails(customer)
+                                            }
+                                            <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                            </tr>
+                                        ))
+                                        : null
                     }
-                    {
-                        customer.data.DetoxDays === undefined
-                            ? <td>--</td>
-                            : <td>{customer.data.DetoxDays} Days</td>
-                    }
-                    {
-                        userAccess === 'staff'
-                            ? null 
-                            : showDetails(customer)
-                    }
-                    {
-                        (((customer.data.payoutRatio) * 100).toFixed(0)) >= 75
-                            ? <td style={{backgroundColor: '#50c878'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
-                            : (((customer.data.payoutRatio) * 100).toFixed(0)) >= 50 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 75
-                                ? <td style={{backgroundColor: '#ffc300'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
-                                : (((customer.data.payoutRatio) * 100).toFixed(0)) > 0 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 50
-                                    ? <td style={{backgroundColor: '#ff5733'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
-                                    : <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
-                    }
-                    <td>{customer.data.facility}</td>
-                    <td>{customer.data.network}</td>
-                    </tr>
-                ))}
                 </tbody>
             </table>
         </div>

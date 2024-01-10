@@ -3,8 +3,38 @@ import React from 'react'
 const ResultTableCompnent = (props) => {
     const {
         list,
-        customersH
+        customersH,
+        userAccess
     } = props
+
+    const formatDollarAmount = (str) => {
+        const num = parseFloat(str);
+        return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    const limitString = (str) => {
+        if (str.length > 30) {
+            return str.substring(0, 30) + '...';
+        } else {
+            return str;
+        }
+    }
+
+    const showDetails = (customer) => {
+        return(
+            <>
+                <td>{formatDollarAmount(customer.data.totalCharges)}</td>
+                <td>{formatDollarAmount(customer.data.totalCharges * .1)}</td>
+                {
+                    customer.data.totalPaid >= 30000
+                        ? <td style={{backgroundColor: '#50c878'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                        : customer.data.totalPaid  > 0
+                            ? <td style={{backgroundColor: '#ff5733'}}>{formatDollarAmount(customer.data.totalPaid)}</td>
+                            : <td>{formatDollarAmount(customer.data.totalPaid)}</td>
+                }
+            </>
+        )
+    }
 
     const displaySplit = () => {
         return(
@@ -17,9 +47,6 @@ const ResultTableCompnent = (props) => {
                             <th>Insurance Name</th>
                             <th>Insurance Prefix</th>
                             <th>Insurance LOC</th>
-                            <th>VOB</th>
-                            <th>Daily Rate</th>
-                            <th>Admitted</th>
                             <th>Last Updated</th>
                         </tr>
                         </thead>
@@ -29,9 +56,6 @@ const ResultTableCompnent = (props) => {
                             <td>{customer.data.insuranceName}</td>
                             <td>{customer.data.insurancePrefix}</td>
                             <td>{customer.data.insuranceLoc}</td>
-                            <td>{customer.data.vob}</td>
-                            <td>{customer.data.dailyRate}</td>
-                            <td>{customer.data.admitted}</td>
                             <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
                             </tr>
                         ))}
@@ -43,12 +67,27 @@ const ResultTableCompnent = (props) => {
                     <table className='table-content'>
                         <thead>
                         <tr>
-                            <th>Insurance Name</th>
-                            <th>Insurance Prefix</th>
-                            <th>Residential Care</th>
-                            <th>Detox Care</th>
-                            <th>Total Charges</th>
-                            <th>Total Paid</th>
+                            <th>Insurance</th>
+                            <th>Policy</th>
+                            <th>Prefix</th>
+                            <th>Residential</th>
+                            <th>Detox</th>
+                            <th>DOC</th>
+                            {
+                                userAccess === 'staff'
+                                    ? null
+                                    : <th>Total Charges</th>
+                            }
+                            {
+                                userAccess === 'staff'
+                                    ? null
+                                    : <th>Deductable</th>
+                            }
+                            {
+                                userAccess === 'staff'
+                                ? null
+                                : <th>Total Paid</th>
+                            }
                             <th>Payout Ratio</th>
                             <th>Facility</th>
                             <th>Network</th>
@@ -57,7 +96,8 @@ const ResultTableCompnent = (props) => {
                         <tbody>
                         {customersH.map((customer, index) => (
                             <tr key={index}>
-                            <td>{customer.data.insuranceName}</td>
+                            <td title={customer.data.insuranceName}>{limitString(customer.data.insuranceName)}</td>
+                            <td>{customer.data.policyNumber}</td>
                             <td>{customer.data.insurancePrefix}</td>
                             {
                                 customer.data.ResidentialDays === undefined
@@ -69,9 +109,21 @@ const ResultTableCompnent = (props) => {
                                     ? <td>--</td>
                                     : <td>{customer.data.DetoxDays} Days</td>
                             }
-                            <td>{customer.data.totalCharges}</td>
-                            <td>{customer.data.totalPaid}</td>
-                            <td>{customer.data.payoutRatio}</td>
+                            <td>{'Alcohol'}</td>
+                            {
+                                userAccess === 'staff'
+                                    ? null 
+                                    : showDetails(customer)
+                            }
+                            {
+                                (((customer.data.payoutRatio) * 100).toFixed(0)) >= 75
+                                    ? <td style={{backgroundColor: '#50c878'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                    : (((customer.data.payoutRatio) * 100).toFixed(0)) >= 50 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 75
+                                        ? <td style={{backgroundColor: '#ffc300'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                        : (((customer.data.payoutRatio) * 100).toFixed(0)) > 0 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 50
+                                            ? <td style={{backgroundColor: '#ff5733'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                            : <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                            }
                             <td>{customer.data.facility}</td>
                             <td>{customer.data.network}</td>
                             </tr>
@@ -93,9 +145,6 @@ const ResultTableCompnent = (props) => {
                             <th>Insurance Name</th>
                             <th>Insurance Prefix</th>
                             <th>Insurance LOC</th>
-                            <th>VOB</th>
-                            <th>Daily Rate</th>
-                            <th>Admitted</th>
                             <th>Last Updated</th>
                         </tr>
                         </thead>
@@ -105,9 +154,6 @@ const ResultTableCompnent = (props) => {
                             <td>{customer.data.insuranceName}</td>
                             <td>{customer.data.insurancePrefix}</td>
                             <td>{customer.data.insuranceLoc}</td>
-                            <td>{customer.data.vob}</td>
-                            <td>{customer.data.dailyRate}</td>
-                            <td>{customer.data.admitted}</td>
                             <td>{new Date(customer.data.lastUpdate.seconds * 1000).toLocaleDateString()}</td>
                             </tr>
                         ))}
@@ -125,12 +171,27 @@ const ResultTableCompnent = (props) => {
                     <table className='table-content'>
                         <thead>
                         <tr>
-                            <th>Insurance Name</th>
-                            <th>Insurance Prefix</th>
-                            <th>Residential Care</th>
-                            <th>Detox Care</th>
-                            <th>Total Charges</th>
-                            <th>Total Paid</th>
+                            <th>Insurance</th>
+                            <th>Policy</th>
+                            <th>Prefix</th>
+                            <th>Residential</th>
+                            <th>Detox</th>
+                            <th>DOC</th>
+                            {
+                                userAccess === 'staff'
+                                    ? null
+                                    : <th>Total Charges</th>
+                            }
+                            {
+                                userAccess === 'staff'
+                                    ? null
+                                    : <th>Deductable</th>
+                            }
+                            {
+                                userAccess === 'staff'
+                                ? null
+                                : <th>Total Paid</th>
+                            }
                             <th>Payout Ratio</th>
                             <th>Facility</th>
                             <th>Network</th>
@@ -139,13 +200,34 @@ const ResultTableCompnent = (props) => {
                         <tbody>
                         {customersH.map((customer, index) => (
                             <tr key={index}>
-                            <td>{customer.data.insuranceName}</td>
+                            <td title={customer.data.insuranceName}>{limitString(customer.data.insuranceName)}</td>
+                            <td>{customer.data.policyNumber}</td>
                             <td>{customer.data.insurancePrefix}</td>
-                            <td>{customer.data.ResidentialDays}</td>
-                            <td>{customer.data.DetoxDays}</td>
-                            <td>{customer.data.totalCharges}</td>
-                            <td>{customer.data.totalPaid}</td>
-                            <td>{customer.data.payoutRatio}</td>
+                            {
+                                customer.data.ResidentialDays === undefined
+                                    ? <td>--</td>
+                                    : <td>{customer.data.ResidentialDays} Days</td>
+                            }
+                            {
+                                customer.data.DetoxDays === undefined
+                                    ? <td>--</td>
+                                    : <td>{customer.data.DetoxDays} Days</td>
+                            }
+                            <td>{'Alcohol'}</td>
+                            {
+                                userAccess === 'staff'
+                                    ? null 
+                                    : showDetails(customer)
+                            }
+                            {
+                                (((customer.data.payoutRatio) * 100).toFixed(0)) >= 75
+                                    ? <td style={{backgroundColor: '#50c878'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                    : (((customer.data.payoutRatio) * 100).toFixed(0)) >= 50 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 75
+                                        ? <td style={{backgroundColor: '#ffc300'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                        : (((customer.data.payoutRatio) * 100).toFixed(0)) > 0 && (((customer.data.payoutRatio) * 100).toFixed(0)) < 50
+                                            ? <td style={{backgroundColor: '#ff5733'}}>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                                            : <td>{((customer.data.payoutRatio) * 100).toFixed(0)}%</td>
+                            }
                             <td>{customer.data.facility}</td>
                             <td>{customer.data.network}</td>
                             </tr>

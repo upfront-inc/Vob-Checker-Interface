@@ -57,7 +57,6 @@ const SignupScreen = (props) => {
             createUserAccount()
         } 
     }
-
     const createUserAccount = () => {
         createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
             .then((userCredential) => {

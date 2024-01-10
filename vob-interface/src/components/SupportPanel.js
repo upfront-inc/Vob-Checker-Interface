@@ -56,16 +56,9 @@ const SupportPanel = () => {
   return (
     <div className='support-panel'>
         <div>
-            <h3>Welcome to Our Support Center</h3>
-        </div>
-        <div>
-            <p>Thank you for visiting the support page of our website. We're excited to have you on board and eager to assist you in every way we can.</p>
-            <p>You are currently using the first iteration of our website. As with any initial version, we anticipate there might be occasional hiccups or unexpected issues. We're committed to making continuous improvements, and your experiences and feedback play a crucial role in this journey.</p>
-        </div>
-        <div>
             <h3>Encountered an Issue? Let Us Know!</h3>
         </div>
-        <div>
+        <div style={{width: '60%'}}>
             <p>If you encounter any issues or have any concerns while using our website, please don't hesitate to reach out. Whether it's a technical problem, a user interface query, or any other challenge, we're here to help. We understand that encountering issues can be frustrating, but rest assured, we're here to ensure a smooth and enjoyable experience on our website. Your feedback and reports are invaluable to us, as they not only help us address your concerns but also contribute to making our website better for everyone.</p>
         </div>
         {

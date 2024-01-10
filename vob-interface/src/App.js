@@ -2,7 +2,7 @@
 
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import image from './assets/logo.png'
+import image from './assets/IntellasuranceLogo_2.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import TableCompnent from './components/TableCompnent';
@@ -14,12 +14,9 @@ import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from 'fire
 import AdminPanel from './components/AdminPanel';
 import ResultTableCompnent from './components/ResultTableComponent';
 import SupportPanel from './components/SupportPanel';
+import DevSupportComponent from './components/DevSupportComponent';
 
 function App() {
-  const [approvedCustomers, setApprovedCustomers] = useState([])
-  const [rejectedCustomers, setRejectedCustomers] = useState([])
-  const [existingCustomers, setexistingCustomers] = useState([])
-  const [unknownCustomers, setUnknownCustomers] = useState([])
   const [currentTab, setCurrentTab] = useState('existing')
   const [loadingData, setLoadingData] = useState('true')
 
@@ -35,6 +32,11 @@ function App() {
 
   const [userAccess, setuserAccess] = useState('staff')
   const [userInfo, setUserInfo] = useState('')
+
+  const [showTab, setShowTab] = useState('full')
+  const [affinityRecords, setAffinityRecords] = useState([])
+  const [beachsideRecords, setBeachsideRecords] = useState([])
+  const [axisRecords, setAxisRecords] = useState([])
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -80,10 +82,13 @@ function App() {
   }
 
   const grabInformation = () => {
+    let affinity = []
+    let beachside = []
+    let axis = []
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = collection(db, 'CurrentInsurance')
-    queryRefBilling = collection(db, 'BillingDetails')
+    queryRefBilling = collection(db, 'BillingDetailsCondensed')
     onSnapshot(queryRefInsruance, snapshot => {
         let insurances = [];
         snapshot.docs.forEach(doc => {
@@ -94,35 +99,25 @@ function App() {
     onSnapshot(queryRefBilling, snapshot => {
         let billings = [];
         snapshot.docs.forEach(doc => {
-            billings.push({data: doc.data(), id: doc.id});
+          let docData = doc.data()
+          billings.push({data: doc.data(), id: doc.id});
+          if(docData.facility === 'Affinity'){
+            affinity.push({data: doc.data(), id: doc.id})
+          } else if(docData.facility === 'Beachside'){
+            beachside.push({data: doc.data(), id: doc.id})
+          } else if(docData.facility === 'Axis'){
+            axis.push({data: doc.data(), id: doc.id})
+          } else {
+            console.log('facility not found')
+          }
         });
+        console.log('axis length', axis.length)
+        setAffinityRecords(affinity)
+        setBeachsideRecords(beachside)
+        setAxisRecords(axis)
         setBillingList(billings)
     });
   }
-
-  // const sortInsurances = (insruances) => {
-  //   let existing = [];
-  //   let approved = [];
-  //   let rejected = [];
-  //   let unknown = [];
-  
-  //   insruances.forEach(customer => {
-  //     if (customer.data.vob === "yes") {
-  //       approved.push(customer);
-  //       existing.push(customer)
-  //     } else if (customer.data.vob === "no") {
-  //       rejected.push(customer);
-  //       existing.push(customer)
-  //     } else if (customer.data.vob === "unknown") {
-  //       unknown.push(customer);
-  //     }
-  //   });
-  
-  //   setApprovedCustomers(approved);
-  //   setRejectedCustomers(rejected);
-  //   setUnknownCustomers(unknown);
-  //   setexistingCustomers(existing)
-  // }
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -139,7 +134,7 @@ function App() {
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), orderBy(sortOption));
-    queryRefBilling = query(collection(db, 'BillingDetails'), orderBy(sortOption));
+    queryRefBilling = query(collection(db, 'BillingDetailsCondensed'), orderBy(sortOption));
     onSnapshot(queryRefInsruance, snapshot => {
       let insurances = [];
       snapshot.docs.forEach(doc => {
@@ -161,7 +156,7 @@ function App() {
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
-    queryRefBilling = query(collection(db, 'BillingDetails'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
+    queryRefBilling = query(collection(db, 'BillingDetailsCondensed'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
     onSnapshot(queryRefInsruance, snapshot => {
       let insurances = [];
       snapshot.docs.forEach(doc => {
@@ -202,63 +197,68 @@ function App() {
         <div className='side-bar'>
           <div>
             <div className='header'>
-              <img style={{height: '57px', width: '170px'}} src={image} alt='Intellisurance logo'/>
+              <img style={{height: '46px', width: '190px'}} src={image} alt='Intellisurance logo'/>
             </div>
-            {/* {
-              currentTab === 'existing' || currentTab === 'yes' || currentTab === 'no' || currentTab === 'new'
-                ? <div>
-                    <div onClick={() => {setCurrentTab('existing')}} className='menu-tab align-horizontally'>
-                      <p>Existing Policies</p>
-                      <FontAwesomeIcon icon={faChevronUp} />
-                    </div>
-                    <div className='sub-menu'>
-                    <div onClick={() => {setCurrentTab('yes')}} className='menu-tab align-horizontally'>
-                        <p className='menu-text'>Accepted Insurances</p>
-                      </div>
-                      <div onClick={() => {setCurrentTab('no')}} className='menu-tab'>
-                        <p className='menu-text'>Rejected Insurances</p>
-                      </div>
-                    </div>
-                    <div onClick={() => {setCurrentTab('new')}} className='menu-tab'>
-                      <p className='menu-text'>Unknown Insurances</p>
-                    </div>
-                  </div>
-                : <div onClick={() => {setCurrentTab('existing')}} className='menu-tab align-horizontally'>
-                    <p>Existing Policies</p>
-                  </div>
-            } */}
             <div onClick={() => {setCurrentTab('existing')}} className='menu-tab align-horizontally'>
-              <p>Existing Policies</p>
+              {
+                currentTab === 'existing'
+                  ? <p style={{color: 'blue'}}>Existing Policies</p>
+                  : <p>Existing Policies</p>
+              }
             </div>
             <div onClick={() => {setCurrentTab('billing')}} className='menu-tab'>
-              <p>Billing Details</p>
+              {
+                currentTab === 'billing'
+                  ? <p style={{color: 'blue'}}>Billing Details</p>
+                  : <p>Billing Details</p>
+              }
             </div>
           </div>
           <div>
             {
-              userAccess === 'Dev'
-                ? <div onClick={() => {setCurrentTab('support')}} className='menu-tab align-horizontally'>
-                    <p>Dev Support</p>
+              userAccess === 'Dev' || userAccess === 'admin' || userAccess === 'owner'
+                ? <div onClick={() => {setCurrentTab('dev-support')}} className='menu-tab align-horizontally'>
+                    {
+                      currentTab === 'dev-support'
+                        ? <p style={{color: 'blue'}}>Support Tickets</p>
+                        : <p>Support Tickets</p>
+                    }
                   </div>
                 : null
             }
             {
               userAccess === 'admin'
                 ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
-                    <p>Admin Panel</p>
+                    {
+                      currentTab === 'admin'
+                        ? <p style={{color: 'blue'}}>Admin Panel</p>
+                        : <p>Admin Panel</p>
+                    }
                   </div>
                 : userAccess === 'owner'
                     ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
-                        <p>Admin Panel</p>
+                        {
+                          currentTab === 'admin'
+                            ? <p style={{color: 'blue'}}>Admin Panel</p>
+                            : <p>Admin Panel</p>
+                        }
                       </div>
                     : userAccess === 'Dev'
                         ? <div onClick={() => {setCurrentTab('admin')}} className='menu-tab align-horizontally'>
-                            <p>Admin Panel</p>
+                            {
+                              currentTab === 'admin'
+                                ? <p style={{color: 'blue'}}>Admin Panel</p>
+                                : <p>Admin Panel</p>
+                            }
                           </div>
                         : null
             }
             <div onClick={() => {setCurrentTab('support')}} className='menu-tab align-horizontally'>
-              <p>Support</p>
+              {
+                currentTab === 'support'
+                  ? <p style={{color: 'blue'}}>Support</p>
+                  : <p>Support</p>
+              }
             </div>
             <div onClick={() => {signoutUser()}} className='menu-tab align-horizontally'>
               <p style={{color: 'red'}}>Logout</p>
@@ -275,32 +275,68 @@ function App() {
               ? null 
               : currentTab === 'support'
                   ? null 
-                  : <div className='top-bar'>
-                      <div className='bottom-bar'>
-                        <div className='search-bar'>
-                          <input 
-                            className='input'
-                            type="text" 
-                            placehexistinger="Search Prefix..." 
-                            value={searchQuery} 
-                            onChange={handleSearchChange} 
-                          />
-                          <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
-                          {
-                            activeSearch === true 
-                              ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
-                              : null 
-                          }
-                        </div> 
-                        <div className='sort-container'>
-                          <p className='sort-header'>Sort: </p>
-                          <select className='sort-select' value={sortOption} onChange={handleSortChange}>
-                            <option value="insuranceName">Insurance Name</option>
-                            <option value="insurancePrefix">Insurance Prefix</option>
-                          </select>
+                  : currentTab === 'billing'
+                      ? <div className='top-bar'>
+                          <div className='bottom-bar'>
+                            <div className='facility-tab'>
+                              <p className='facility-header'>Facility:</p>
+                              <p onClick={() => {setShowTab('affinity')}} className='facility-text'>Affinity</p>
+                              <p onClick={() => {setShowTab('beachside')}} className='facility-text'>Beachside</p>
+                              <p onClick={() => {setShowTab('axis')}} className='facility-text'>Axis</p>
+                              <p onClick={() => {setShowTab('full')}} className='facility-text'>All</p>
+                            </div>
+                            <div className='bottom-bar-side'>
+                              <div className='search-bar'>
+                                <input 
+                                  className='input'
+                                  type="text" 
+                                  placehexistinger="Search Prefix..." 
+                                  value={searchQuery} 
+                                  onChange={handleSearchChange} 
+                                />
+                                <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
+                                {
+                                  activeSearch === true 
+                                    ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
+                                    : null 
+                                }
+                              </div> 
+                              <div className='sort-container'>
+                                <p className='sort-header'>Sort: </p>
+                                <select className='sort-select' value={sortOption} onChange={handleSortChange}>
+                                  <option value="insuranceName">Insurance Name</option>
+                                  <option value="insurancePrefix">Insurance Prefix</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      : <div className='top-bar'>
+                          <div className='bottom-bar'>
+                            <div className='search-bar'>
+                              <input 
+                                className='input'
+                                type="text" 
+                                placehexistinger="Search Prefix..." 
+                                value={searchQuery} 
+                                onChange={handleSearchChange} 
+                              />
+                              <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
+                              {
+                                activeSearch === true 
+                                  ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
+                                  : null 
+                              }
+                            </div> 
+                            <div className='sort-container'>
+                              <p className='sort-header'>Sort: </p>
+                              <select className='sort-select' value={sortOption} onChange={handleSortChange}>
+                                <option value="insuranceName">Insurance Name</option>
+                                <option value="insurancePrefix">Insurance Prefix</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
           }
           <div className='content-container'>
             {
@@ -312,14 +348,22 @@ function App() {
                 : currentTab === 'existing'
                     ? <TableCompnent list={insruanceList}/>
                     : currentTab === 'results'
-                        ? <ResultTableCompnent list={insruanceList} customersH={billingList}/>
+                        ? <ResultTableCompnent list={insruanceList} userAccess={userAccess} customersH={billingList}/>
                         : currentTab === 'billing'
-                            ? <MoreDetailTableComponent userAccess={userAccess} billingList={billingList}/>
-                            : currentTab === 'support'
-                                ? <SupportPanel />
-                                : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner' || userAccess === 'Dev')
-                                    ? <AdminPanel userInfo={userInfo}/>
-                                    : null
+                            ? <MoreDetailTableComponent 
+                                userAccess={userAccess}
+                                showTab={showTab} 
+                                billingList={billingList} 
+                                affinityRecords={affinityRecords}
+                                beachsideRecords={beachsideRecords}
+                                axisRecords={axisRecords}/>
+                            : currentTab === 'dev-support'
+                                ? <DevSupportComponent />
+                                : currentTab === 'support'
+                                    ? <SupportPanel />
+                                    : currentTab === 'admin' && (userAccess === 'admin' || userAccess === 'owner' || userAccess === 'Dev')
+                                        ? <AdminPanel userInfo={userInfo}/>
+                                        : null
 
             }
           </div>
