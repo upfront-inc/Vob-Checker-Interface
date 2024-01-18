@@ -38,7 +38,7 @@ const AdminPanel = (props) => {
         if (window.confirm("Are you sure you want to make this user an admin?")) {
             const userRef = doc(db, 'users', userId);
             updateDoc(userRef, { status: 'admin' })
-                .then(() => console.log(`User ${userId} made admin`))
+                .then(() => {})
                 .catch((error) => console.error("Error updating user:", error));
         }
     };
@@ -47,7 +47,7 @@ const AdminPanel = (props) => {
         if (window.confirm("Are you sure you want to remove this user from admin?")) {
             const userRef = doc(db, 'users', userId);
             updateDoc(userRef, { status: 'staff' })
-                .then(() => console.log(`Admin ${userId} changed to staff`))
+                .then(() => {})
                 .catch((error) => console.error("Error updating user:", error));
         }
     };
@@ -56,7 +56,7 @@ const AdminPanel = (props) => {
         if (window.confirm("Are you sure you want to delete this user's account?")) {
             const userRef = doc(db, 'users', userId);
             updateDoc(userRef, { type: 'suspended' })
-                .then(() => console.log(`Admin ${userId} changed to staff`))
+                .then(() => {})
                 .catch((error) => console.error("Error updating user:", error));
         }
     };

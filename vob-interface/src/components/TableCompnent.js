@@ -19,9 +19,6 @@ const TableCompnent = (props) => {
                 </tr>
                 </thead>
                 <tbody>
-                {
-                    console.log(JSON.stringify(list[0]))
-                }
                 {list.map((customer, index) => (
                     <tr key={index}>
                     <td>{customer.data.insuranceName}</td>

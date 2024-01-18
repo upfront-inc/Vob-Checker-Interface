@@ -32,7 +32,7 @@ const DevSupportComponent = () => {
         setViewTicket(false)
         const userRef = doc(db, 'Support', ticketId);
         updateDoc(userRef, { status: 'closed' })
-            .then(() => console.log(`Ticket #${selectedTicket.ticket} has been updated`))
+            .then(() => {})
             .catch((error) => console.error("Error updating user:", error));
     }
 

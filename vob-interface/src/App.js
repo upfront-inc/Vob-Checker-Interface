@@ -88,7 +88,7 @@ function App() {
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = collection(db, 'CurrentInsurance')
-    queryRefBilling = collection(db, 'BillingDetailsCondensed')
+    queryRefBilling = collection(db, 'BillingDetailsPrefixVOB')
     onSnapshot(queryRefInsruance, snapshot => {
         let insurances = [];
         snapshot.docs.forEach(doc => {
@@ -101,17 +101,20 @@ function App() {
         snapshot.docs.forEach(doc => {
           let docData = doc.data()
           billings.push({data: doc.data(), id: doc.id});
-          if(docData.facility === 'Affinity'){
+          if(docData.facility === 'AFFINITY'){
             affinity.push({data: doc.data(), id: doc.id})
-          } else if(docData.facility === 'Beachside'){
+          } else if(docData.facility === 'BEACHSIDE'){
             beachside.push({data: doc.data(), id: doc.id})
-          } else if(docData.facility === 'Axis'){
+          } else if(docData.facility === 'AXIS'){
             axis.push({data: doc.data(), id: doc.id})
           } else {
             console.log('facility not found')
           }
         });
         console.log('axis length', axis.length)
+        console.log('beachside length', beachside.length)
+        console.log('affinity length', affinity.length)
+        console.log('affinity length', billings.length)
         setAffinityRecords(affinity)
         setBeachsideRecords(beachside)
         setAxisRecords(axis)
@@ -134,7 +137,7 @@ function App() {
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), orderBy(sortOption));
-    queryRefBilling = query(collection(db, 'BillingDetailsCondensed'), orderBy(sortOption));
+    queryRefBilling = query(collection(db, 'BillingDetailsPrefix2'), orderBy(sortOption));
     onSnapshot(queryRefInsruance, snapshot => {
       let insurances = [];
       snapshot.docs.forEach(doc => {
@@ -156,7 +159,7 @@ function App() {
     let queryRefInsruance;
     let queryRefBilling;
     queryRefInsruance = query(collection(db, 'CurrentInsurance'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
-    queryRefBilling = query(collection(db, 'BillingDetailsCondensed'), where('insurancePrefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
+    queryRefBilling = query(collection(db, 'BillingDetailsPrefix2'), where('prefix', '==', searchQuery.toUpperCase()),orderBy(sortOption));
     onSnapshot(queryRefInsruance, snapshot => {
       let insurances = [];
       snapshot.docs.forEach(doc => {
@@ -215,6 +218,17 @@ function App() {
             </div>
           </div>
           <div>
+            {
+              userAccess === 'Dev' 
+                ? <div onClick={() => {setCurrentTab('dev-tools')}} className='menu-tab align-horizontally'>
+                    {
+                      currentTab === 'dev-support'
+                        ? <p style={{color: 'blue'}}>Dev Tools</p>
+                        : <p>Dev Tools</p>
+                    }
+                  </div>
+                : null
+            }
             {
               userAccess === 'Dev' || userAccess === 'admin' || userAccess === 'owner'
                 ? <div onClick={() => {setCurrentTab('dev-support')}} className='menu-tab align-horizontally'>
@@ -339,9 +353,6 @@ function App() {
                         </div>
           }
           <div className='content-container'>
-            {
-              console.log(currentTab)
-            }
             {
               loadingData === true
                 ? <p>Loading</p>

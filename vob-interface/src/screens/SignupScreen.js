@@ -60,7 +60,6 @@ const SignupScreen = (props) => {
     const createUserAccount = () => {
         createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
             .then((userCredential) => {
-                console.log(JSON.stringify(userCredential.user))
                 createProfile(userCredential.user)
             })
             .catch((error) => {
@@ -69,7 +68,6 @@ const SignupScreen = (props) => {
         }
         
     const createProfile = (user) => {
-        console.log(user.uid)
         const userRef = doc(db, "users", user.uid);
         const userData = {
             userId: user.uid,

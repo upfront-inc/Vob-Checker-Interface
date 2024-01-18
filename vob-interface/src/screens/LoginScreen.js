@@ -48,7 +48,6 @@ const LoginScreen = (props) => {
                         setActiveAccount(false)
                     }
                 } else {
-                    console.log("No such user!");
                     return null;
                 }
             })
@@ -60,11 +59,9 @@ const LoginScreen = (props) => {
     const resetPasswordForUser = () => {
         sendPasswordResetEmail(auth, resetEmail.toLowerCase())
         .then(response => {
-            console.log('email reset password sent')
             setResettingPassword(false)
         })
         .catch(error => {
-            console.log(error)
         })
     }
 
