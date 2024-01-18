@@ -2,7 +2,7 @@ import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth';
 
-import authorized from './Firebaseconfig';
+import authorized from './Authorization';
 
 const firebaseConfigProduction = {
   apiKey: authorized.FIREBASE_API_KEY,

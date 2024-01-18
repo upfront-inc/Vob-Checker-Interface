@@ -10,22 +10,21 @@ const MoreDetailTableComponent = (props) => {
         showTab,
         affinityRecords,
         beachsideRecords,
-        axisRecords
+        axisRecords,
+        showPrefix,
+        showInsurance,
+        showNetwork,
+        showResDays,
+        showResVisits,
+        showDetoxDays,
+        showDetoxVisits,
+        showFacility,
+        showTotalCharge,
+        showTotalPaid,
+        showPayout,
+        showVobDecision,
+        showVobPercent,
     } = props
-
-    const [showPrefix, setShowPrefix] = useState(true)
-    const [showInsurance, setShowInsurance] = useState(true)
-    const [showNetwork, setShowNetwork] = useState(true)
-    const [showResDays, setShowResDays] = useState(true)
-    const [showResVisits, setShowResVisits] = useState(true)
-    const [showDetoxDays, setShowDetoxDays] = useState(true)
-    const [showDetoxVisits, setShowDetoxVisits] = useState(true)
-    const [showFacility, setShowFacility] = useState(true)
-    const [showTotalCharge, setShowTotalCharge] = useState(true)
-    const [showTotalPaid, setShowTotalPaid] = useState(true)
-    const [showPayout, setShowPayout] = useState(true)
-    const [showVobDecision, setShowVobDecision] = useState(true)
-    const [showVobPercent, setShowVobPercent] = useState(true)
 
     const [showSubTable, setShowSubTable] = useState(false)
     const [subRecords, setSubRecords] = useState([])
@@ -73,58 +72,6 @@ const MoreDetailTableComponent = (props) => {
         setSubRecords([]);
     };
 
-    const handleShowPrefix = () => {
-        setShowPrefix(!showPrefix)
-    }
-
-    const handleShowInsurance = () => {
-        setShowInsurance(!showInsurance)
-    }
-
-    const handleShowNetwork = () => {
-        setShowNetwork(!showNetwork)
-    }
-
-    const handleShowResDays = () => {
-        setShowResDays(!showResDays)
-    }
-
-    const handleShowResVisits = () => {
-        setShowResVisits(!showResVisits)
-    }
-
-    const handleShowDetoxDays = () => {
-        setShowDetoxDays(!showDetoxDays)
-    }
-
-    const handleShowDetoxVisits = () => {
-        setShowDetoxVisits(!showDetoxVisits)
-    }
-
-    const handleShowFacility = () => {
-        setShowFacility(!showFacility)
-    }
-
-    const handleShowTotalCharge = () => {
-        setShowTotalCharge(!showTotalCharge)
-    }
-
-    const handleShowTotalPaid = () => {
-        setShowTotalPaid(!showTotalPaid)
-    }
-
-    const handleShowPayout = () => {
-        setShowPayout(!showPayout)
-    }
-
-    const handleShowVobDecision = () => {
-        setShowVobDecision(!showVobDecision)
-    }
-
-    const handleShowVobPercent = () => {
-        setShowVobPercent(!showVobPercent)
-    }
-
     const formatDollarAmount = (str) => {
         const num = parseFloat(str);
         return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -140,60 +87,6 @@ const MoreDetailTableComponent = (props) => {
 
     return (
         <div>
-            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: '12px'}}>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="prefix" name="prefix" onChange={handleShowPrefix} checked={showPrefix}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Prefix</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="insurance" name="insurance" onChange={handleShowInsurance} checked={showInsurance}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Insurance</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="network" name="network" onChange={handleShowNetwork} checked={showNetwork}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Network</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="resDays" name="resDays" onChange={handleShowResDays} checked={showResDays}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Res. Days</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="resVisits" name="resVisits" onChange={handleShowResVisits} checked={showResVisits}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Res. Visits</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="detoxDays" name="detoxDays" onChange={handleShowDetoxDays} checked={showDetoxDays}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Detox Days</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="detoxVisits" name="detoxVisits" onChange={handleShowDetoxVisits} checked={showDetoxVisits}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Detox Visits</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="facility" name="facility" onChange={handleShowFacility} checked={showFacility}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Facility</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="totalCharges" name="totalCharges" onChange={handleShowTotalCharge} checked={showTotalCharge}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Total Charges</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="totalPaid" name="totalPaid" onChange={handleShowTotalPaid} checked={showTotalPaid}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Total Paid</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="payout" name="payout" onChange={handleShowPayout} checked={showPayout}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">Payout Ratio</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="decision" name="decision" onChange={handleShowVobDecision} checked={showVobPercent}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">ADMIT</label> 
-                </div>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginRight: '10px'}}>
-                    <input type="checkbox" id="vobPercent" name="vobPercent" onChange={handleShowVobPercent} checked={showVobPercent}/>
-                    <label style={{whiteSpace: 'nowrap', marginLeft: '4px'}} htmlFor="prefix">ADMIT %</label> 
-                </div>
-            </div>
             {
                 showSubTable
                     ? <div className="table-container-details-sub-split hide-scrollbar">

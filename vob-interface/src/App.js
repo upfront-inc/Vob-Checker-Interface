@@ -38,6 +38,26 @@ function App() {
   const [beachsideRecords, setBeachsideRecords] = useState([])
   const [axisRecords, setAxisRecords] = useState([])
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const [showPrefix, setShowPrefix] = useState(true)
+    const [showInsurance, setShowInsurance] = useState(true)
+    const [showNetwork, setShowNetwork] = useState(true)
+    const [showResDays, setShowResDays] = useState(true)
+    const [showResVisits, setShowResVisits] = useState(true)
+    const [showDetoxDays, setShowDetoxDays] = useState(true)
+    const [showDetoxVisits, setShowDetoxVisits] = useState(true)
+    const [showFacility, setShowFacility] = useState(true)
+    const [showTotalCharge, setShowTotalCharge] = useState(true)
+    const [showTotalPaid, setShowTotalPaid] = useState(true)
+    const [showPayout, setShowPayout] = useState(true)
+    const [showVobDecision, setShowVobDecision] = useState(true)
+    const [showVobPercent, setShowVobPercent] = useState(true)
+
+  const toggleDropdown = () => {
+      setIsDropdownOpen(!isDropdownOpen);
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
@@ -194,6 +214,59 @@ function App() {
     });
   }
 
+
+const handleShowPrefix = () => {
+    setShowPrefix(!showPrefix)
+}
+
+const handleShowInsurance = () => {
+    setShowInsurance(!showInsurance)
+}
+
+const handleShowNetwork = () => {
+    setShowNetwork(!showNetwork)
+}
+
+const handleShowResDays = () => {
+    setShowResDays(!showResDays)
+}
+
+const handleShowResVisits = () => {
+    setShowResVisits(!showResVisits)
+}
+
+const handleShowDetoxDays = () => {
+    setShowDetoxDays(!showDetoxDays)
+}
+
+const handleShowDetoxVisits = () => {
+    setShowDetoxVisits(!showDetoxVisits)
+}
+
+const handleShowFacility = () => {
+    setShowFacility(!showFacility)
+}
+
+const handleShowTotalCharge = () => {
+    setShowTotalCharge(!showTotalCharge)
+}
+
+const handleShowTotalPaid = () => {
+    setShowTotalPaid(!showTotalPaid)
+}
+
+const handleShowPayout = () => {
+    setShowPayout(!showPayout)
+}
+
+const handleShowVobDecision = () => {
+    setShowVobDecision(!showVobDecision)
+}
+
+const handleShowVobPercent = () => {
+    setShowVobPercent(!showVobPercent)
+}
+
   const displayContent = () => {
     return(
       <div className="App-header">
@@ -311,8 +384,8 @@ function App() {
                                 <button style={{borderRadius:'8px', marginLeft: '16px'}} onClick={() => {searchCurrentQuery()}}>Search</button>
                                 {
                                   activeSearch === true 
-                                    ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
-                                    : null 
+                                  ? <div onClick={() => {clearSearch()}} style={{marginLeft: '16px', color: 'blue'}}>Clear Search</div>
+                                  : null 
                                 }
                               </div> 
                               <div className='sort-container'>
@@ -322,11 +395,92 @@ function App() {
                                   <option value="insurancePrefix">Insurance Prefix</option>
                                 </select>
                               </div>
+                              <button style={{borderRadius:'8px', padding: '4px', paddingLeft: '8px', paddingRight: '8px'}} onClick={() => {toggleDropdown()}}>Filter Options</button>
+                              {
+                                !isDropdownOpen
+                                  ? null
+                                  : <div style={{
+                                        position: 'absolute',
+                                        width: '190px',
+                                        top: 75, 
+                                        right: 22,
+                                        zIndex: 1000, 
+                                        backgroundColor: 'white',
+                                        borderRadius: '8px',
+                                        paddingTop: '16px',
+                                        paddingBottom: '16px',
+                                        border: '2px solid grey',
+                                    }}>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="prefix" name="prefix" onChange={handleShowPrefix} checked={showPrefix}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">PREFIX</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="insurance" name="insurance" onChange={handleShowInsurance} checked={showInsurance}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">INSURANCE</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="network" name="network" onChange={handleShowNetwork} checked={showNetwork}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">NETWORK</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="resDays" name="resDays" onChange={handleShowResDays} checked={showResDays}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">RES. DAYS</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="resVisits" name="resVisits" onChange={handleShowResVisits} checked={showResVisits}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">RES VISITS</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="detoxDays" name="detoxDays" onChange={handleShowDetoxDays} checked={showDetoxDays}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">DETOX DAYS</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="detoxVisits" name="detoxVisits" onChange={handleShowDetoxVisits} checked={showDetoxVisits}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">DETOX VISITS</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="facility" name="facility" onChange={handleShowFacility} checked={showFacility}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">FACILITY</label> 
+                                        </div>
+                                        {
+                                          userAccess === 'staff' || userAccess === 'owner' || userAccess === 'dev'
+                                          ? null
+                                          : <div style={{marginRight: '10px'}}>
+                                                <input type="checkbox" id="totalCharges" name="totalCharges" onChange={handleShowTotalCharge} checked={showTotalCharge}/>
+                                                <label style={{fontSize: '12px'}} htmlFor="prefix">TOTAL CHARGES</label> 
+                                            </div>
+                                        }
+                                        {
+                                          userAccess === 'staff' || userAccess === 'owner' || userAccess === 'dev'
+                                            ? null
+                                            : <div style={{marginRight: '10px'}}>
+                                                <input type="checkbox" id="totalPaid" name="totalPaid" onChange={handleShowTotalPaid} checked={showTotalPaid}/>
+                                                <label style={{fontSize: '12px'}} htmlFor="prefix">TOTAL PAID</label> 
+                                              </div>
+                                        }
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="payout" name="payout" onChange={handleShowPayout} checked={showPayout}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">PAYOUT RATIO</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="decision" name="decision" onChange={handleShowVobDecision} checked={showVobPercent}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">ADMIT</label> 
+                                        </div>
+                                        <div style={{marginRight: '10px'}}>
+                                            <input type="checkbox" id="vobPercent" name="vobPercent" onChange={handleShowVobPercent} checked={showVobPercent}/>
+                                            <label style={{fontSize: '12px'}} htmlFor="prefix">ADMIT %</label> 
+                                        </div>
+                                    </div>
+                              }
                             </div>
                           </div>
                         </div>
                       : <div className='top-bar'>
                           <div className='bottom-bar'>
+                            <div>
+                              Filter
+                            </div>
                             <div className='search-bar'>
                               <input 
                                 className='input'
@@ -367,7 +521,20 @@ function App() {
                                 billingList={billingList} 
                                 affinityRecords={affinityRecords}
                                 beachsideRecords={beachsideRecords}
-                                axisRecords={axisRecords}/>
+                                axisRecords={axisRecords}
+                                showPrefix={showPrefix}
+                                showInsurance={showInsurance}
+                                showNetwork={showNetwork}
+                                showResDays={showResDays}
+                                showResVisits={showResVisits}
+                                showDetoxDays={showDetoxDays}
+                                showDetoxVisits={showDetoxVisits}
+                                showFacility={showFacility}
+                                showTotalCharge={showTotalCharge}
+                                showTotalPaid={showTotalPaid}
+                                showPayout={showPayout}
+                                showVobDecision={showVobDecision}
+                                showVobPercent={showVobPercent}/>
                             : currentTab === 'dev-support'
                                 ? <DevSupportComponent />
                                 : currentTab === 'support'

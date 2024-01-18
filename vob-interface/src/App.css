@@ -237,7 +237,6 @@
 }
 
 .search-bar {
-  width: 100%;
   display: flex;
   flex-direction: row;
   margin-right: 24px;
@@ -250,18 +249,27 @@
   border-radius: 8px;
 }
 
+.filter-option-button {
+  border-radius: '8px';
+  margin-left: '16px';
+  width: '156px';
+  padding: '8px';
+}
+
 .sort-container {
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-right: 24px;
 }
 
 .sort-select {
   padding: 4px;
   font-size: 14px;
   font-weight: 600;
-  margin-left: 16px;
+  margin-left: 8px;
   border-radius: 8px;
+  border: 2px solid black;
 }
 
 .sort-header {
